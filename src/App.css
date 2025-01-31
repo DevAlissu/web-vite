@@ -1,0 +1,200 @@
+*{
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+}
+body {
+  font-family: "Roboto";
+}
+
+/** MENU SIDEBAR **/
+
+/** MENU SIDEBAR **/
+
+.ant-menu-dark .ant-menu-item {
+  
+
+  display: flex;
+  margin: 0 auto;
+  background-color: #FFF;
+  font-weight: 400; 
+  border: solid 0px #b6b3b3;
+
+  line-height: 14px;
+  padding: 25px;
+  margin-top: 10px;
+  color: #0d0d0d;
+  font-size: 16px;
+
+}
+
+.ant-menu-dark .ant-menu-item:hover {
+  background-color: rgb(250, 250, 250);
+  
+}
+
+/*** HEADER ***/
+
+.header-app{
+  
+  width: 100%;
+  height: 100%;
+  display: flex;
+  
+  
+}
+
+
+
+
+
+
+
+/* CSS */
+.ant-menu-dark .ant-menu-item:hover {
+  color: #007AFF;
+  font-size: 16px;
+  
+}
+
+
+.item_menu_draw{
+  display: block;
+  background-color: #e8eaef70;
+  margin-top: 10px;
+  padding: 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #555867;
+}
+
+.item_menu_draw:hover{
+  
+  color: #FFF;
+}
+
+.header-card .header-itens {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+
+  margin: 10px;
+
+}
+
+.header-itens-botton {
+  display: flex;
+  justify-content: baseline;
+  align-items: center;
+
+}
+
+.header-itens-botton span {
+  margin-left: 10px;
+}
+
+
+
+
+
+
+.panel{
+
+  display: flex;
+  flex-wrap: wrap;
+  flex-basis: 100;
+  padding: 10px 20px;
+  margin-top: 0px;
+  gap: 10px;
+
+  
+
+  
+
+}
+
+.panel-content{
+  flex-grow: 1;
+  
+  min-width: 20%; 
+  background: #FFF;
+  border-radius: 1px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 3px 14px;
+
+  display: flex;
+  flex-direction: column;
+  
+  
+  align-items: flex-start;
+  padding: 10px;
+  /** ESSE AQUI PODE ATE TIRAR **/
+  
+}
+
+
+
+
+.menu{
+  display:block;
+}
+
+.menu_hamburguer{
+  display: none;
+}
+
+
+
+
+.ant-btn:hover{
+  background-color: #FFF;
+}
+
+.ant-layout{
+  height: 100%;
+  
+  
+}
+
+/*** Icones***/
+
+.icon-edit-table:hover{
+    color: #007AFF;
+}
+
+
+
+
+
+/*MEDIA*/
+
+@media only screen and (max-width: 1308px) {
+  body{
+    min-height: 100vh;
+  }
+   
+
+   .panel{
+     flex-direction: column;
+   }
+
+   .panel-content{
+     width: 100%;
+   }
+
+   
+
+   .ant-layout{
+     min-height: 100%;
+   }
+
+   
+  
+  .menu{
+    display: none;
+  }
+
+  .menu_hamburguer{
+    display: block;
+  }
+}
+

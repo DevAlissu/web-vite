@@ -1,0 +1,18 @@
+:root {
+    --primary-color: #004281;
+    --primary-hover: #003366;
+    --secondary-color: #6c757d;
+    --danger-color: #d75c5d;
+    --background-light: #f8f9fa;
+    --background-dark: #242424;
+    --text-light: rgba(2, 2, 2, 0.87);
+    --text-dark: #213547;
+
+    /* Fontes */
+    --font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --font-size-title: 28px;
+    --font-size-subtitle: 14px;
+
+    /* Layout */
+    --border-radius: 8px;
+}

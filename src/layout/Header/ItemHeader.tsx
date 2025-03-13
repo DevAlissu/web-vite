@@ -21,7 +21,7 @@ export default function ItemHeader() {
       </div>
 
       <div style={{ fontSize: "24px", fontWeight: "bold", color: "#FFF" }}>
-        <h1>teste</h1>
+        <h1></h1>
       </div>
 
       <div>

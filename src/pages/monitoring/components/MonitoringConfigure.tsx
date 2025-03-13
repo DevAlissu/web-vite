@@ -7,7 +7,7 @@ import ItemHeaderCabecalho from "../../../layout/Header/components/ItemHeaderCab
 import Button from "../../../components/Button/Button";
 import MonitoringDetails from "./MonitoringDetails";
 import { useMonitoringById } from "../hooks/useMonitoringById";
-import SectionList from "./SectionList"; // Importando o SectionList
+import SectionList from "./SectionList"; 
 
 const MonitoringConfigure: React.FC = () => {
   const { monitoring, loading } = useMonitoringById();

@@ -42,6 +42,16 @@ import MonitoringAddSection from "../pages/monitoring/components/MonitoringAddSe
 // Seções dentro do Monitoramento
 import SectionList from "../pages/monitoring/components/SectionList";
 
+// Quizzes
+import QuizzesPage from "../pages/quizzes/Quizzes";
+import QuizRegister from "../pages/quizzes/quizregister/Register";
+import EditQuiz from "../pages/quizzes/components/EditQuiz";
+
+// Missões
+import MissionsPage from "../pages/missions/Missions";
+import MissionRegister from "../pages/missions/missionregister/Register";
+import EditMission from "../pages/missions/components/EditMission";
+
 const Routers = () => {
   return (
     <Routes>
@@ -87,6 +97,16 @@ const Routers = () => {
 
       {/* Adicionar Seção */}
       <Route path="/monitoring/add-section/:id" element={<MonitoringAddSectionWrapper />} />
+
+      {/* Quizzes */}
+      <Route path="/quizzes" element={<QuizzesPage />} />
+      <Route path="/quizzes/register" element={<QuizRegister />} />
+      <Route path="/quizzes/edit/:id" element={<EditQuiz />} />
+
+      {/* Missões */}
+      <Route path="/missions" element={<MissionsPage />} />
+      <Route path="/missions/register" element={<MissionRegister />} />
+      <Route path="/missions/edit/:id" element={<EditMission />} />
 
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="*" element={<Navigate to="/home" replace />} />

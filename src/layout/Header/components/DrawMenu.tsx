@@ -26,7 +26,7 @@ const DrawMenu: React.FC = () => {
     setOpen(false);
   };
 
-  if (!isMobile) return null; // Se não for mobile, não renderiza o menu
+  if (!isMobile) return null; 
 
   return (
     <>

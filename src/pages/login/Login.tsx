@@ -5,6 +5,8 @@ import { Eye, EyeClosed, User } from "lucide-react";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import api from "../../services/api";
 
+import "primeflex/primeflex.css"; 
+
 import BackgroundImage from "../../assets/background.jpg";
 import ImageLogoLogin from "../../assets/logo-footer1.png";
 import EmbrapiLogo from "../../assets/embrapi_logo.png";
@@ -19,7 +21,7 @@ interface LoginDTO {
 export type NotificationType = "success" | "info" | "warning" | "error";
 
 export default function Login() {
-  const { login } = useAuth(); // Usa o contexto de autenticação
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [loginObject, setLoginObject] = useState<LoginDTO>({
     username: "",
@@ -48,8 +50,8 @@ export default function Login() {
     try {
       const response = await api.post("/login/", loginObject);
       if (response.status === 200) {
-        login(response.data.access); // ✅ Salva o token no contexto corretamente
-        navigate("/home"); // ✅ Redireciona para home sem precisar recarregar
+        login(response.data.access);
+        navigate("/home");
       } else {
         openNotificationWithIcon("error", "Erro de login", "Usuário ou senha inválidos.");
       }
@@ -64,10 +66,10 @@ export default function Login() {
       style={{ backgroundImage: `url(${BackgroundImage})` }}
     >
       {contextHolder}
-      <div className="w-full max-w-[850px] bg-white rounded-lg shadow-lg flex flex-col md:flex-row overflow-hidden h-auto md:h-[480px]">
+      <div className="w-full max-w-[850px] bg-white rounded-lg shadow-lg flex flex-col md:flex-row align-items-stretch overflow-hidden h-auto md:h-[500px]">
         {/* Lado Esquerdo - Formulário */}
-        <div className="w-full md:w-1/2 p-6 flex flex-col items-center text-center justify-center">
-          <img src={ImageLogoLogin} alt="Logo" className="mb-4 w-48 md:w-52" />
+        <div className="w-full md:w-1/2 p-6 flex flex-col items-center text-center justify-center max-w-md mx-auto">
+          <img src={ImageLogoLogin} alt="Logo" className="mb-4 w-10" />
           <h1 className="text-xl font-semibold text-gray-800 mb-4">
             Acesse sua conta
           </h1>
@@ -91,14 +93,15 @@ export default function Login() {
           >
             Entrar
           </Button>
-          <div className="flex justify-center mt-6 space-x-6">
+          {/* Ajuste no alinhamento dos logos */}
+          <div className="flex justify-center items-center mt-6 space-x-6">
             <img src={InovaLogo} alt="Inova" className="w-20 h-auto" />
             <img src={EmbrapiLogo} alt="Embrapi" className="w-24 h-auto" />
           </div>
         </div>
 
-        {/* Lado Direito - Imagem (some em telas pequenas) */}
-        <div className="w-full md:w-1/2 hidden md:block relative h-[240px] md:h-auto">
+        {/* Lado Direito - Imagem (mantendo altura fixa para evitar quebra) */}
+        <div className="hidden md:flex w-full md:w-1/2 h-auto md:h-[500px] relative">
           <img
             src={ImageLogin}
             alt="Operador"

@@ -5,41 +5,39 @@ import ItemSideBar from "../../../layout/Sidebar/ItemSideBar";
 import ItemHeader from "../../../layout/Header/ItemHeader";
 import ItemHeaderCabecalho from "../../../layout/Header/components/ItemHeaderCabecalho";
 import DynamicForm from "../../../components/form/DynamicForm";
-import { useIoTDevicesStore } from "../../../store/iotDevices";
-import { getEquipments } from "../../../services/equipmentsService";
+import { useProductionLinesStore } from "../../../store/ProductionLinesStore";
+import { getSectors } from "../../../services/SectorsService";
 
-const IoTDevicesRegister: React.FC = () => {
+const ProductionLinesRegister: React.FC = () => {
   const navigate = useNavigate();
-  const { addDevice } = useIoTDevicesStore();
+  const { createProductionLine } = useProductionLinesStore();
   const [loading, setLoading] = useState(false);
   const [loadingOptions, setLoadingOptions] = useState(true);
-  const [equipments, setEquipments] = useState<{ value: number; label: string }[]>([]);
+  const [sectorsOptions, setSectorsOptions] = useState<{ value: number; label: string }[]>([]);
 
   const [formValues, setFormValues] = useState({
     name: "",
-    type_device: "",
-    equipement: null,
+    description: "",
+    value_mensuration_estimated: "",
+    setor: null,
   });
 
   useEffect(() => {
-    const fetchEquipments = async () => {
+    const fetchSectors = async () => {
       try {
-        const equipmentList = await getEquipments();
-        setEquipments(
-          equipmentList.map((eq: { id: number; name: string }) => ({
-            value: eq.id,
-            label: eq.name,
-          }))
+        const sectorsData = await getSectors();
+        setSectorsOptions(
+          sectorsData.map((sector) => ({ value: sector.id, label: sector.name }))
         );
+        setLoadingOptions(false);
       } catch (error) {
-        message.error("Erro ao carregar equipamentos!");
-        console.error(error);
-      } finally {
+        message.error("Erro ao carregar setores. Tente novamente.");
+        console.error("Erro ao buscar setores:", error);
         setLoadingOptions(false);
       }
     };
 
-    fetchEquipments();
+    fetchSectors();
   }, []);
 
   const handleChange = (name: string, value: any) => {
@@ -48,25 +46,26 @@ const IoTDevicesRegister: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!formValues.name.trim()) {
-      message.error("O nome do dispositivo é obrigatório!");
+      message.error("O nome da linha de produção é obrigatório!");
       return;
     }
 
-    if (loading) return;
-
     setLoading(true);
     try {
-      await addDevice({
+      await createProductionLine({
         name: formValues.name,
-        type_device: formValues.type_device,
-        equipement: formValues.equipement ? Number(formValues.equipement) : null,
+        description: formValues.description || "",
+        value_mensuration_estimated: formValues.value_mensuration_estimated
+          ? Number(formValues.value_mensuration_estimated)
+          : 0,
+        setor: formValues.setor ? Number(formValues.setor) : null,
       });
 
-      message.success("Dispositivo cadastrado com sucesso!");
-      navigate("/iotdevices");
+      message.success("Linha de produção cadastrada com sucesso!");
+      navigate("/production-lines"); // 🔹 Ajustado para a URL correta
     } catch (error) {
-      message.error("Erro ao cadastrar dispositivo!");
-      console.error(error);
+      message.error("Erro ao cadastrar linha de produção. Verifique os dados e tente novamente.");
+      console.error("Erro ao cadastrar linha de produção:", error);
     } finally {
       setLoading(false);
     }
@@ -79,18 +78,19 @@ const IoTDevicesRegister: React.FC = () => {
         <ItemHeader />
         <main className="content">
           <ItemHeaderCabecalho
-            title="Cadastro de Dispositivo IoT"
-            subTitle="Preencha os campos abaixo para cadastrar um novo dispositivo"
+            title="Cadastro de Linha de Produção"
+            subTitle="Preencha os campos abaixo para cadastrar uma nova linha de produção"
           />
           <DynamicForm
             fields={[
-              { name: "name", label: "Nome do Dispositivo", type: "input", required: true },
-              { name: "type_device", label: "Tipo do Dispositivo", type: "input", required: true },
+              { name: "name", label: "Nome", type: "input", required: true },
+              { name: "description", label: "Descrição", type: "textarea" },
+              { name: "value_mensuration_estimated", label: "Valor Estimado", type: "number" },
               {
-                name: "equipement",
-                label: "Equipamento Vinculado (Opcional)",
+                name: "setor",
+                label: "Setor",
                 type: "select",
-                options: equipments,
+                options: sectorsOptions,
                 disabled: loadingOptions,
               },
             ]}
@@ -98,7 +98,7 @@ const IoTDevicesRegister: React.FC = () => {
             onChange={handleChange}
             onSubmit={handleSubmit}
             loading={loading}
-            onCancel={() => navigate("/iotdevices")}
+            onCancel={() => navigate("/production-lines")}
           />
         </main>
       </div>
@@ -106,4 +106,4 @@ const IoTDevicesRegister: React.FC = () => {
   );
 };
 
-export default IoTDevicesRegister;
+export default ProductionLinesRegister;

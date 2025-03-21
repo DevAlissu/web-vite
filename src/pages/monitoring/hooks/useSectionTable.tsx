@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSectionStore } from "@/store/sectionStore"; // Certifique-se que o caminho está correto
+import { useSectionStore } from "@/store/sectionStore";
 import { message } from "antd";
-import { SectionItem } from "@/types/sectionTypes"; // Tipagem dos itens das seções
+import { SectionItem } from "@/types/sections";
 import Actions from "@/components/actions/Actions";
 
 export const useSectionTable = () => {
@@ -10,32 +10,27 @@ export const useSectionTable = () => {
   const { sections, fetchSections, deleteSection } = useSectionStore();
   const [loading, setLoading] = useState(true);
 
-  // Carrega as seções ao montar o componente
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        await fetchSections(); // Chama a função fetchSections para buscar os dados
+        await fetchSections();
       } catch (error) {
         message.error("Erro ao carregar seções.");
       } finally {
         setLoading(false);
       }
     };
-    sections.forEach((f)=>{
-      console.log(f+"teste")
-    })
 
-    fetchData(); // Chama fetchData ao montar o componente
-  }, [fetchSections]); // Dependência de fetchSections
+    fetchData();
+  }, [fetchSections]);
 
-  // Definindo as colunas da tabela
   const columns = [
     {
       title: "Nome",
       dataIndex: "name",
       key: "name",
-      sorter: (a: SectionItem, b: SectionItem) => a.name.localeCompare(b.name), // Ordenação de nome
+      sorter: (a: SectionItem, b: SectionItem) => a.name.localeCompare(b.name),
     },
     {
       title: "Descrição",
@@ -52,11 +47,13 @@ export const useSectionTable = () => {
       key: "actions",
       render: (_: any, record: SectionItem) => (
         <Actions
-          onEdit={() => navigate(`/monitoring/configure/${record.monitoring}/edit-section/${record.id}`)} // Navega para editar a seção
+          onEdit={() =>
+            navigate(`/monitoring/configure/${record.monitoring}/edit-section/${record.id}`)
+          }
           onDelete={async () => {
             if (record.id) {
               try {
-                await deleteSection(record.id); // Exclui a seção
+                await deleteSection(record.id);
                 message.success("Seção excluída.");
               } catch (error) {
                 message.error("Erro ao excluir a seção.");
@@ -68,5 +65,5 @@ export const useSectionTable = () => {
     },
   ];
 
-  return { columns, sections, loading }; // Retorna as colunas, seções e o status de carregamento
+  return { columns, sections, loading };
 };

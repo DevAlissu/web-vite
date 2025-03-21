@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSectionStore } from "@/store/sectionStore";
 import { getSections, createSection, updateSection, deleteSection } from "@/services/SectionsService";
-import { SectionItem } from "@/types/sectionTypes";
+import { SectionItem } from "@/types/sections";
 
 export const useSection = () => {
   const { sections, fetchSections, loading } = useSectionStore();

@@ -2,16 +2,31 @@ export interface SectionItem {
   id: number;
   name: string;
   description: string | null;
-  estimated_consumption: number;
-  power: number | null;
-  tension: number | null;
-  min_consumption: number;
-  max_consumption: number;
-  monitoring: number | null; // Relacionamento com monitoramento
-  productionLine: number | null; // Caso esteja associado a uma linha de produção
-  parentId?: number; // Seção pai (Setor → Linha → Equipamento)
-  children?: SectionItem[]; // Subsessoes (Linhas e Equipamentos de um Setor)
-  isMonitored?: boolean; // Seção está sendo monitorada?
-  devices?: number[]; // IDs dos dispositivos IoT
-  type: "sector" | "productionLine" | "equipment"; // Define o tipo da seção
+  is_monitored: boolean;
+  monitoring: number | null;
+
+  // Associações
+  setor: number | null;
+  productionLine: number | null;
+  equipament: number | null;
+  DeviceIot: number | null;
+
+  // Tipo da seção (1 = setor, 2 = linha, 3 = equipamento)
+  type_section: number | null;
+
+  // Referência à seção pai
+  secticon_parent: number | null;
+
+  // Sub-seções aninhadas
+  sections_filhas?: SectionItem[];
+
+  // Campos adicionais
+  estimated_consumption?: number;
+  power?: number | null;
+  tension?: number | null;
+  min_consumption?: number | null;
+  max_consumption?: number | null;
+
+  // Tipo literal opcional para renderização
+  type?: "sector" | "productionLine" | "equipment";
 }

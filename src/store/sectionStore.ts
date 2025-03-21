@@ -1,45 +1,35 @@
 import { create } from "zustand";
-import { SectionItem } from "@/types/sectionTypes";
-import { Subsection } from "@/types/subsectionTypes"; // Defina o tipo de subseção, se necessário
-import api from "@/services/api";
+import { SectionItem } from "@/types/sections"; // Importa o tipo atualizado
+import api from "@/services/api"; // Importa a API
 
 interface SectionState {
   sections: SectionItem[];
-  subsections: Subsection[]; // Novo estado para subseções
   loading: boolean;
   fetchSections: () => Promise<void>;
-  fetchSubsections: (sectionId: number) => Promise<void>; // Função para buscar subseções
   addSection: (data: Partial<SectionItem>) => Promise<void>;
   updateSection: (id: number, data: Partial<SectionItem>) => Promise<void>;
   deleteSection: (id: number) => Promise<void>;
-  addSubsection: (data: Partial<Subsection>, sectionId: number) => Promise<void>; // Função para adicionar subseção
-  deleteSubsection: (id: number) => Promise<void>; // Função para excluir subseção
 }
 
 export const useSectionStore = create<SectionState>((set) => ({
   sections: [],
-  subsections: [],
   loading: false,
 
   fetchSections: async () => {
     set({ loading: true });
     try {
       const response = await api.get<SectionItem[]>("/sections/");
-      set({ sections: response.data });
+      
+      // Garante que `sections_filhas` sempre esteja presente
+      const sectionsWithChildren = response.data.map((section) => ({
+        ...section,
+        sections_filhas: section.sections_filhas || [],
+      }));
+
+      set({ sections: sectionsWithChildren });
+      console.log("Seções carregadas:", sectionsWithChildren);
     } catch (error) {
       console.error("Erro ao buscar seções:", error);
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  fetchSubsections: async (sectionId: number) => {
-    set({ loading: true });
-    try {
-      const response = await api.get<Subsection[]>(`/api/sub_sections/?section=${sectionId}`);
-      set({ subsections: response.data });
-    } catch (error) {
-      console.error("Erro ao buscar subseções:", error);
     } finally {
       set({ loading: false });
     }
@@ -49,8 +39,9 @@ export const useSectionStore = create<SectionState>((set) => ({
     try {
       const response = await api.post("/sections/", data);
       set((state) => ({
-        sections: [...state.sections, response.data],
+        sections: [...state.sections, { ...response.data, sections_filhas: [] }],
       }));
+      console.log("Seção adicionada:", response.data);
     } catch (error) {
       console.error("Erro ao adicionar seção:", error);
     }
@@ -64,6 +55,7 @@ export const useSectionStore = create<SectionState>((set) => ({
           s.id === id ? { ...s, ...data } : s
         ),
       }));
+      console.log(`Seção ${id} atualizada.`);
     } catch (error) {
       console.error("Erro ao atualizar seção:", error);
     }
@@ -75,30 +67,9 @@ export const useSectionStore = create<SectionState>((set) => ({
       set((state) => ({
         sections: state.sections.filter((s) => s.id !== id),
       }));
+      console.log(`Seção ${id} excluída.`);
     } catch (error) {
       console.error("Erro ao excluir seção:", error);
-    }
-  },
-
-  addSubsection: async (data, sectionId) => {
-    try {
-      const response = await api.post("/api/sub_sections/", { ...data, section: sectionId });
-      set((state) => ({
-        subsections: [...state.subsections, response.data],
-      }));
-    } catch (error) {
-      console.error("Erro ao adicionar subseção:", error);
-    }
-  },
-
-  deleteSubsection: async (id) => {
-    try {
-      await api.delete(`/api/sub_sections/${id}/`);
-      set((state) => ({
-        subsections: state.subsections.filter((sub) => sub.id !== id),
-      }));
-    } catch (error) {
-      console.error("Erro ao excluir subseção:", error);
     }
   },
 }));

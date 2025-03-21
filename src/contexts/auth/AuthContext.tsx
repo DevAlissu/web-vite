@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Definição do tipo do contexto
+
 interface AuthContextProps {
   token: string | null;
   login: (token: string) => void;
   logout: () => void;
 }
 
-// Criando o contexto de autenticação
+
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -22,14 +22,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  // Método para login
+
   const login = (newToken: string) => {
     localStorage.setItem("userToken", newToken);
     setToken(newToken);
-    navigate("/home");  // Redireciona após login
+    navigate("/home");  
   };
 
-  // Método para logout
+ 
   const logout = () => {
     localStorage.removeItem("userToken");
     setToken(null);
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// Hook para acessar o contexto
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

@@ -22,6 +22,9 @@ export const useSectionTable = () => {
         setLoading(false);
       }
     };
+    sections.forEach((f)=>{
+      console.log(f+"teste")
+    })
 
     fetchData(); // Chama fetchData ao montar o componente
   }, [fetchSections]); // Dependência de fetchSections

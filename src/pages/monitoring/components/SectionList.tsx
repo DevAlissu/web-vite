@@ -7,7 +7,8 @@ import { useSubsections } from "../hooks/useSubsection";
 const SectionList: React.FC = () => {
   const { columns, sections, loading } = useSectionTable(); 
   const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
-
+  
+ 
   
   const { subsections, loading: loadingSubsections } = useSubsections(
     selectedSectionId || 0,

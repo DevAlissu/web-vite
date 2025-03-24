@@ -1,5 +1,5 @@
 import api from "./api";
-import { SectionItem } from "../types/sectionTypes";
+import { SectionItem } from "../types/sections";
 import { Subsection } from "../types/subsectionTypes";
 
 // Buscar todas as seções

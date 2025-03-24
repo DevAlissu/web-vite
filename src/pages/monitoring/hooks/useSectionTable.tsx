@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useSectionStore } from "@/store/sectionStore";
 import { message } from "antd";
 import { SectionItem } from "@/types/sections";
-import Actions from "@/components/actions/Actions";
+import { useIoTDevices } from "@/hooks/useIoTDevices";
 
 export const useSectionTable = () => {
-  const navigate = useNavigate();
-  const { sections, fetchSections, deleteSection } = useSectionStore();
+  const { sections, fetchSections, deleteSection, updateSection } = useSectionStore();
   const [loading, setLoading] = useState(true);
+  const [selectedSection, setSelectedSection] = useState<SectionItem | null>(null);
+  const [configureVisible, setConfigureVisible] = useState(false);
+  const { devices, fetchDevices } = useIoTDevices();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         await fetchSections();
+        await fetchDevices();
       } catch (error) {
         message.error("Erro ao carregar seções.");
       } finally {
@@ -25,7 +27,31 @@ export const useSectionTable = () => {
     fetchData();
   }, [fetchSections]);
 
-  const columns = [
+  const handleConfigure = (section: SectionItem) => {
+    setSelectedSection(section);
+    setConfigureVisible(true);
+  };
+
+  const handleSaveConfigure = async (data: Partial<SectionItem>) => {
+    if (!selectedSection) return;
+
+    try {
+      const updatedData: Partial<SectionItem> = {
+        ...selectedSection,
+        is_monitored: data.is_monitored,
+        DeviceIot: data.is_monitored ? data.DeviceIot : null,
+      };
+
+      await updateSection(selectedSection.id, updatedData);
+      message.success("Seção configurada com sucesso.");
+      setConfigureVisible(false);
+    } catch (error) {
+      message.error("Erro ao configurar seção.");
+      console.error(error);
+    }
+  };
+
+  const baseColumns = [
     {
       title: "Nome",
       dataIndex: "name",
@@ -42,28 +68,18 @@ export const useSectionTable = () => {
       dataIndex: "estimated_consumption",
       key: "estimated_consumption",
     },
-    {
-      title: "Ações",
-      key: "actions",
-      render: (_: any, record: SectionItem) => (
-        <Actions
-          onEdit={() =>
-            navigate(`/monitoring/configure/${record.monitoring}/edit-section/${record.id}`)
-          }
-          onDelete={async () => {
-            if (record.id) {
-              try {
-                await deleteSection(record.id);
-                message.success("Seção excluída.");
-              } catch (error) {
-                message.error("Erro ao excluir a seção.");
-              }
-            }
-          }}
-        />
-      ),
-    },
   ];
 
-  return { columns, sections, loading };
+  return {
+    columns: baseColumns,
+    sections,
+    loading,
+    configureVisible,
+    selectedSection,
+    setConfigureVisible,
+    handleConfigure,
+    handleSaveConfigure,
+    deleteSection,
+    devices,
+  };
 };

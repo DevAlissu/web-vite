@@ -7,7 +7,7 @@ import { useSectorsStore } from "../../../store/sectors";
 import { useProductionLinesStore } from "../../../store/ProductionLinesStore"; 
 import { useEquipamentsStore } from "../../../store/equipaments"; 
 import { useIoTDevices } from "../../../hooks/useIoTDevices";
-import { createTypeSection } from "../../../services/SectionsService"; 
+
 
 const MonitoringAddSection: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,10 +34,7 @@ const MonitoringAddSection: React.FC = () => {
     fetchSectors();
     fetchProductionLines();
     fetchEquipaments();
-    // Criar tipos de seção se ainda não existirem
-    createTypeSection("setor");
-    createTypeSection("linha");
-    createTypeSection("equipamento");
+
   }, []);
 
   const handleChange = (name: string, value: any) => {
@@ -86,10 +83,10 @@ const MonitoringAddSection: React.FC = () => {
         is_monitored: formValues.is_monitored,
         monitoring: Number(id),
         type_section: typeSectionId,
-        deviceIot: formValues.is_monitored ? formValues.deviceIot : null,
+        DeviceIot: formValues.is_monitored ? formValues.deviceIot : null,
         setor: formValues.type_section === "setor" ? formValues.section_consume : null,
         productionLine: formValues.type_section === "linha" ? formValues.section_consume : null,
-        Equipament: formValues.type_section === "equipamento" ? formValues.section_consume : null,
+        equipament: formValues.type_section === "equipamento" ? formValues.section_consume : null,
       });
 
       message.success("Seção adicionada com sucesso!");

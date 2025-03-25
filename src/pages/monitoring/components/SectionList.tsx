@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { Table, Collapse, Tree, Button, message } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
-import { useParams } from "react-router-dom";
 import { SectionItem } from "@/types/sections";
 import { useSectionTable } from "../hooks/useSectionTable";
 import MonitoringConfigureSectionModal from "./MonitoringConfigureSectionModal";
 import Actions from "@/components/actions/Actions";
 
 const SectionList: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
   const {
     columns,
     sections,
@@ -18,9 +16,7 @@ const SectionList: React.FC = () => {
 
   const [sectionToConfigure, setSectionToConfigure] = useState<SectionItem | null>(null);
 
-  const monitoringId = Number(id);
-  const filteredSections = sections.filter((s) => s.monitoring === monitoringId);
-  const setores = filteredSections.filter((s) => !s.secticon_parent);
+  const setores = sections.filter((s) => !s.secticon_parent);
 
   const handleOpenConfig = (section: SectionItem) => setSectionToConfigure(section);
   const handleCloseConfig = () => setSectionToConfigure(null);
@@ -32,6 +28,7 @@ const SectionList: React.FC = () => {
       key: "actions",
       render: (_: any, record: SectionItem) => (
         <Actions
+          // Descomente abaixo quando a tela de edição estiver pronta
           // onEdit={() => navigate(`/monitoring/configure/${record.monitoring}/edit-section/${record.id}`)}
           onEdit={() => console.log("Editar:", record.id)}
           onDelete={async () => {
@@ -56,7 +53,7 @@ const SectionList: React.FC = () => {
         loading={loading}
         rowKey="id"
         expandedRowRender={(record: SectionItem) => {
-          const linhas = filteredSections.filter((l) => l.secticon_parent === record.id);
+          const linhas = sections.filter((l) => l.secticon_parent === record.id);
 
           const treeData = linhas.map((linha) => ({
             title: (
@@ -71,7 +68,7 @@ const SectionList: React.FC = () => {
               </span>
             ),
             key: `linha-${linha.id}`,
-            children: filteredSections
+            children: sections
               .filter((e) => e.secticon_parent === linha.id)
               .map((equip) => ({
                 title: (
@@ -119,3 +116,5 @@ const SectionList: React.FC = () => {
 };
 
 export default SectionList;
+
+

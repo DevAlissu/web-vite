@@ -1,114 +1,87 @@
-import React, { useState } from "react";
-import { Table, Collapse, Tree, Button, message } from "antd";
-import { SettingOutlined } from "@ant-design/icons";
-import { SectionItem } from "@/types/sections";
+import { Table, Badge } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSectionTable } from "../hooks/useSectionTable";
+import { useSectionHierarchy } from "../hooks/useSectionHierarchy";
+import { useSectionActions } from "../hooks/useSectionActions";
+import { columnsWithActions } from "./columnsWithActions";
+import SectionExpandedTree from "./SectionExpandedTree";
 import MonitoringConfigureSectionModal from "./MonitoringConfigureSectionModal";
-import Actions from "@/components/actions/Actions";
+import { SectionItem } from "@/types/sections";
 
-const SectionList: React.FC = () => {
+const SectionList = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
   const {
     columns,
     sections,
     loading,
-    deleteSection,
+    sectionToConfigure,
+    isConfigureModalVisible,
+    handleOpenConfigure,
+    handleCloseConfigure,
   } = useSectionTable();
 
-  const [sectionToConfigure, setSectionToConfigure] = useState<SectionItem | null>(null);
+  const { handleDelete } = useSectionActions();
+  const { setoresPrincipais } = useSectionHierarchy(sections);
 
-  const setores = sections.filter((s) => !s.secticon_parent);
+  // Verifica se uma seção ou qualquer descendente possui IoT
+  const hasIotDeviceRecursive = (section: SectionItem, allSections: SectionItem[]): boolean => {
+    if (section.DeviceIot) return true;
+    const children = allSections.filter((s) => s.secticon_parent === section.id);
+    return children.some((child) => hasIotDeviceRecursive(child, allSections));
+  };
 
-  const handleOpenConfig = (section: SectionItem) => setSectionToConfigure(section);
-  const handleCloseConfig = () => setSectionToConfigure(null);
+  // Substituir a coluna "Nome" para adicionar LED verde
+  const enhancedColumns = columns.map((col) => {
+    if (col.key === "name") {
+      return {
+        ...col,
+        render: (_: unknown, record: SectionItem) => {
+          const hasIot = hasIotDeviceRecursive(record, sections);
+          return (
+            <span>
+              {hasIot && <Badge status="success" style={{ marginRight: 6 }} />}
+              {record.name}
+            </span>
+          );
+        },
+      };
+    }
+    return col;
+  });
 
-  const columnsWithActions = [
-    ...columns,
-    {
-      title: "Ações",
-      key: "actions",
-      render: (_: any, record: SectionItem) => (
-        <Actions
-          // Descomente abaixo quando a tela de edição estiver pronta
-          // onEdit={() => navigate(`/monitoring/configure/${record.monitoring}/edit-section/${record.id}`)}
-          onEdit={() => console.log("Editar:", record.id)}
-          onDelete={async () => {
-            try {
-              await deleteSection(record.id);
-              message.success("Seção excluída com sucesso.");
-            } catch (err) {
-              message.error("Erro ao excluir.");
-            }
-          }}
-          onConfigure={() => handleOpenConfig(record)}
-        />
-      ),
-    },
-  ];
+  const actionColumns = columnsWithActions(enhancedColumns, {
+    onEdit: (sectionId) => navigate(`/monitoring/edit-section/${sectionId}`),
+    onDelete: handleDelete,
+    onConfigure: handleOpenConfigure,
+  });
 
   return (
     <>
       <Table
-        columns={columnsWithActions}
-        dataSource={setores}
+        columns={actionColumns}
+        dataSource={setoresPrincipais.filter((s) => s.monitoring === Number(id))}
         loading={loading}
         rowKey="id"
-        expandedRowRender={(record: SectionItem) => {
-          const linhas = sections.filter((l) => l.secticon_parent === record.id);
-
-          const treeData = linhas.map((linha) => ({
-            title: (
-              <span>
-                {linha.name}
-                <Button
-                  type="text"
-                  icon={<SettingOutlined />}
-                  onClick={() => handleOpenConfig(linha)}
-                  style={{ marginLeft: 8 }}
-                />
-              </span>
-            ),
-            key: `linha-${linha.id}`,
-            children: sections
-              .filter((e) => e.secticon_parent === linha.id)
-              .map((equip) => ({
-                title: (
-                  <span>
-                    {equip.name}
-                    <Button
-                      type="text"
-                      icon={<SettingOutlined />}
-                      onClick={() => handleOpenConfig(equip)}
-                      style={{ marginLeft: 8 }}
-                    />
-                  </span>
-                ),
-                key: `equip-${equip.id}`,
-              })),
-          }));
-
-          return (
-            <Collapse
-              items={[
-                {
-                  key: `panel-${record.id}`,
-                  label: "Subseções",
-                  children: treeData.length > 0 ? (
-                    <Tree treeData={treeData} defaultExpandAll />
-                  ) : (
-                    <p>Não há subseções associadas.</p>
-                  ),
-                },
-              ]}
+        expandable={{
+          expandedRowRender: (record: SectionItem) => (
+            <SectionExpandedTree
+              section={record}
+              allSections={sections}
+              onConfigure={handleOpenConfigure}
+              onDelete={handleDelete}
             />
-          );
+          ),
         }}
+        pagination={{ pageSize: 10 }}
       />
 
       {sectionToConfigure && (
         <MonitoringConfigureSectionModal
           section={sectionToConfigure}
-          open={!!sectionToConfigure}
-          onClose={handleCloseConfig}
+          open={isConfigureModalVisible}
+          onClose={handleCloseConfigure}
         />
       )}
     </>
@@ -116,5 +89,3 @@ const SectionList: React.FC = () => {
 };
 
 export default SectionList;
-
-

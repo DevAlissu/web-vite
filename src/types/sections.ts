@@ -1,3 +1,4 @@
+// types/sections.ts
 export interface SectionItem {
   id: number;
   name: string;
@@ -11,7 +12,7 @@ export interface SectionItem {
   equipament: number | null;
   DeviceIot: number | null;
 
-  // Tipo da seção (1 = setor, 2 = linha, 3 = equipamento)
+  // Tipo da seção ("SETOR", "LINHA", "EQUIPAMENTO")
   type_section: number | null;
 
   // Referência à seção pai

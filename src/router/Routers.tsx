@@ -38,7 +38,8 @@ import MonitoringPage from "../pages/monitoring/Monitoring";
 import MonitoringRegister from "../pages/monitoring/components/MonitoringForm";
 import MonitoringConfigure from "../pages/monitoring/components/MonitoringConfigure";
 import MonitoringAddSection from "../pages/monitoring/components/MonitoringAddSection";
-
+import MonitoringEdit from "../pages/monitoring/components/MonitoringEdit";
+import SectionEdit from "../pages/monitoring/components/SectionEdit";
 // Seções dentro do Monitoramento
 import SectionList from "../pages/monitoring/components/SectionList";
 
@@ -102,13 +103,13 @@ const Routers = () => {
               <Route path="/monitoring" element={<MonitoringPage />} />
               <Route path="/monitoring/register" element={<MonitoringRegister />} />
               <Route path="/monitoring/configure/:id" element={<MonitoringConfigure />} />
-
+              <Route path="/monitoring/edit-section/:id" element={<SectionEdit />} />
               {/* Seções dentro do Monitoramento */}
               <Route path="/monitoring/configure/:id/sections" element={<SectionList />} />
 
               {/* Adicionar Seção */}
               <Route path="/monitoring/add-section/:id" element={<MonitoringAddSection />} />
-
+              <Route path="/monitoring/edit/:id" element={<MonitoringEdit />} />
               {/* Quizzes */}
               <Route path="/quizzes" element={<QuizzesPage />} />
               <Route path="/quizzes/register" element={<QuizRegister />} />

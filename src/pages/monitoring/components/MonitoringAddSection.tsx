@@ -1,63 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, message } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
-import DynamicForm from "../../../components/form/DynamicForm";
-import { useSectionStore } from "../../../store/sectionStore";
-import { useSectorsStore } from "../../../store/sectors"; 
-import { useProductionLinesStore } from "../../../store/ProductionLinesStore"; 
-import { useEquipamentsStore } from "../../../store/equipaments"; 
-import { useIoTDevices } from "../../../hooks/useIoTDevices";
-
+import { useSectionStore } from "@/store/sectionStore";
+import { useSectionForm } from "@/pages/monitoring/hooks/useSectionForm";
+import SectionForm from "./SectionForm";
 
 const MonitoringAddSection: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addSection, fetchSections } = useSectionStore();
-  const { devices, fetchDevices } = useIoTDevices();
-  const { sectors, fetchSectors } = useSectorsStore(); 
-  const { productionLines, fetchProductionLines } = useProductionLinesStore(); 
-  const { equipaments, fetchEquipaments } = useEquipamentsStore(); 
-  
+  const { addSection } = useSectionStore();
+
+  const {
+    formValues,
+    handleChange,
+    getAvailableSections,
+    devices,
+    typeSections, // ✅ Tipos de seção da API
+  } = useSectionForm();
+
   const [loading, setLoading] = useState(false);
-  const [formValues, setFormValues] = useState({
-    name: "",
-    description: "",
-    is_monitored: false,
-    type_section: null as "setor" | "linha" | "equipamento" | null, 
-    section_consume: null,
-    deviceIot: null,
-  });
-
-  useEffect(() => {
-    fetchDevices();
-    fetchSections();
-    fetchSectors();
-    fetchProductionLines();
-    fetchEquipaments();
-
-  }, []);
-
-  const handleChange = (name: string, value: any) => {
-    setFormValues((prev) => {
-      if (name === "is_monitored") {
-        return { ...prev, [name]: value, deviceIot: value ? prev.deviceIot : null };
-      }
-      return { ...prev, [name]: value };
-    });
-  };
-
-  const getAvailableSections = () => {
-    switch (formValues.type_section) {
-      case "setor":
-        return sectors.map((sector) => ({ value: sector.id, label: sector.name }));
-      case "linha":
-        return productionLines.map((line) => ({ value: line.id, label: line.name }));
-      case "equipamento":
-        return equipaments.map((equip) => ({ value: equip.id, label: equip.name }));
-      default:
-        return [];
-    }
-  };
 
   const handleSubmit = async () => {
     if (!formValues.name.trim()) {
@@ -65,36 +26,33 @@ const MonitoringAddSection: React.FC = () => {
       return;
     }
 
-    setLoading(true);
-    
-    let typeSectionId = null;
-    if (formValues.type_section === "setor") {
-      typeSectionId = 1;
-    } else if (formValues.type_section === "linha") {
-      typeSectionId = 2;
-    } else if (formValues.type_section === "equipamento") {
-      typeSectionId = 3;
+    const typeId = typeSections.find((t) => t.name === formValues.type_section)?.id;
+
+    if (!typeId) {
+      message.error("ID do tipo de seção não encontrado!");
+      return;
     }
 
+    console.log("👉 Enviando tipo_section ID:", typeId);
+
+    setLoading(true);
     try {
       await addSection({
         name: formValues.name,
-        description: formValues.description,
         is_monitored: formValues.is_monitored,
         monitoring: Number(id),
-        type_section: typeSectionId,
+        type_section: typeId,
         DeviceIot: formValues.is_monitored ? formValues.deviceIot : null,
-        setor: formValues.type_section === "setor" ? formValues.section_consume : null,
-        productionLine: formValues.type_section === "linha" ? formValues.section_consume : null,
-        equipament: formValues.type_section === "equipamento" ? formValues.section_consume : null,
+        setor: formValues.type_section === "SETOR" ? formValues.section_consume : null,
+        productionLine: formValues.type_section === "LINHA" ? formValues.section_consume : null,
+        equipament: formValues.type_section === "EQUIPAMENTO" ? formValues.section_consume : null,
       });
 
       message.success("Seção adicionada com sucesso!");
-      fetchSections();
       navigate(`/monitoring/configure/${id}`);
     } catch (error) {
+      console.error("❌ Erro real ao adicionar:", error);
       message.error("Erro ao adicionar seção!");
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -104,45 +62,18 @@ const MonitoringAddSection: React.FC = () => {
     <Modal
       title="Adicionar Nova Seção"
       open={true}
-      onOk={handleSubmit}
+      footer={null}
       onCancel={() => navigate(`/monitoring/configure/${id}`)}
-      confirmLoading={loading}
     >
-      <DynamicForm
-        fields={[
-          { name: "name", label: "Nome da Seção", type: "input", required: true },
-          { name: "description", label: "Descrição", type: "textarea" },
-          { name: "is_monitored", label: "Monitorado?", type: "switch" },
-          { 
-            name: "type_section", 
-            label: "Tipo da Seção", 
-            type: "select", 
-            options: [
-              { value: "setor", label: "Setor" },
-              { value: "linha", label: "Linha de Produção" },
-              { value: "equipamento", label: "Equipamento" },
-            ],
-            onChange: (value) => setFormValues((prev) => ({ ...prev, type_section: value, section_consume: null })),
-          },
-          {
-            name: "section_consume",
-            label: "Seção de Consumo",
-            type: "select",
-            options: getAvailableSections(),
-            disabled: !formValues.type_section, 
-          },
-          {
-            name: "deviceIot",
-            label: "Dispositivo IoT",
-            type: "select",
-            options: devices.map((device) => ({ value: device.id, label: device.name })),
-            disabled: !formValues.is_monitored,
-          },
-        ]}
+      <SectionForm
         values={formValues}
         onChange={handleChange}
+        onCancel={() => navigate(`/monitoring/configure/${id}`)}
         onSubmit={handleSubmit}
         loading={loading}
+        availableSections={getAvailableSections()}
+        devices={devices}
+        typeSections={typeSections} // ✅ Passa os tipos pro form
       />
     </Modal>
   );

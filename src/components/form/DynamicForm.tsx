@@ -1,5 +1,5 @@
 import React from "react";
-import { Form } from "antd";
+import { Form, Input } from "antd";
 import FormField from "./FormField";
 import type { FormField as FormFieldType } from "./formTypes";
 import Actions from "../actions/Actions";
@@ -9,7 +9,7 @@ interface DynamicFormProps {
   values: Record<string, any>;
   loading?: boolean;
   onChange: (name: string, value: any) => void;
-  onSubmit: () => void;
+  onSubmit?: () => void; // Agora opcional
   onCancel?: () => void;
 }
 
@@ -22,14 +22,38 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 }) => {
   return (
     <Form layout="vertical" className="dynamic-form">
-      {fields.map((field) => (
-        <FormField key={field.name} field={field} value={values[field.name]} onChange={onChange} />
-      ))}
+      {fields.map((field) => {
+        if (field.type === "readonly") {
+          return (
+            <Form.Item key={field.name} label={field.label}>
+              <Input
+                value={values[field.name]}
+                readOnly
+                style={{
+                  backgroundColor: "#f5f5f5",
+                  color: "#000",
+                  cursor: "not-allowed",
+                }}
+              />
+            </Form.Item>
+          );
+        }
 
-      {/* Renderiza os botões de Enviar e Cancelar dentro de Actions */}
-      <div className="form-actions">
-        <Actions onSubmit={onSubmit} onCancel={onCancel} />
-      </div>
+        return (
+          <FormField
+            key={field.name}
+            field={field}
+            value={values[field.name]}
+            onChange={onChange}
+          />
+        );
+      })}
+
+      {(onSubmit || onCancel) && (
+        <div className="form-actions">
+          <Actions onSubmit={onSubmit} onCancel={onCancel} />
+        </div>
+      )}
     </Form>
   );
 };

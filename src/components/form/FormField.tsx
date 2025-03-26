@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import { Input, Select, Upload, Form, Button, InputNumber, Switch } from "antd";
-import { UploadOutlined, ThunderboltOutlined, PoweroffOutlined, BulbOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  ThunderboltOutlined,
+  PoweroffOutlined,
+  BulbOutlined,
+} from "@ant-design/icons";
 import type { FormField } from "./formTypes";
 import { RcFile } from "antd/lib/upload";
 
 interface FormFieldProps {
   field: FormField;
-  value?: string | number | boolean | RcFile | undefined; // Ajustando os tipos aceitos para cada componente
+  value?: string | number | boolean | RcFile | undefined;
   onChange: (name: string, value: string | number | boolean | RcFile | null) => void;
 }
 
@@ -27,7 +32,6 @@ const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) => {
     }
   };
 
-  // Ícones para Equipamentos
   const getIcon = () => {
     switch (field.name) {
       case "power":
@@ -47,9 +51,26 @@ const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) => {
         return (
           <Input
             placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}`}
-            value={value as string} // Garantir que value seja string para Input
+            value={value as string}
             onChange={(e) => onChange(field.name, e.target.value)}
             style={{ width: "100%", height: "40px", padding: "4px 11px" }}
+          />
+        );
+
+      case "readonly":
+        return (
+          <Input
+            value={value as string}
+            readOnly
+            style={{
+              width: "100%",
+              padding: "8px",
+              border: "1px solid #d9d9d9",
+              borderRadius: "4px",
+              backgroundColor: "#f5f5f5",
+              color: "#000",
+              cursor: "not-allowed",
+            }}
           />
         );
 
@@ -57,7 +78,7 @@ const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) => {
         return (
           <Input.Password
             placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}`}
-            value={value as string} // Garantir que value seja string para Input.Password
+            value={value as string}
             onChange={(e) => onChange(field.name, e.target.value)}
             style={{
               width: "100%",
@@ -66,7 +87,6 @@ const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) => {
               lineHeight: "normal",
               borderRadius: "6px",
             }}
-            className="custom-password-input"
           />
         );
 
@@ -75,7 +95,7 @@ const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) => {
           <Form.Item validateStatus={error ? "error" : ""} help={error}>
             <InputNumber
               placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}`}
-              value={value as number} // Garantir que value seja number para InputNumber
+              value={value as number}
               onChange={(val) => validateNumber(field.name, val)}
               style={{ width: "100%" }}
               addonBefore={getIcon()}
@@ -87,7 +107,7 @@ const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) => {
         return (
           <Input.TextArea
             placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}`}
-            value={value as string} // Garantir que value seja string para TextArea
+            value={value as string}
             onChange={(e) => onChange(field.name, e.target.value)}
             rows={4}
           />
@@ -97,7 +117,7 @@ const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) => {
         return (
           <Select
             placeholder={field.placeholder || "Selecione uma opção"}
-            value={value as string | number | undefined} // Garantir que value seja string ou number para Select
+            value={value as string | number | undefined}
             onChange={(val) => onChange(field.name, val)}
             style={{ width: "100%" }}
             disabled={field.disabled}
@@ -114,21 +134,23 @@ const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) => {
         return (
           <Upload
             beforeUpload={(file: RcFile) => {
-              onChange(field.name, file); // Garantir que o valor seja RcFile
+              onChange(field.name, file);
               return false;
             }}
             showUploadList={true}
             maxCount={1}
             accept=".png, .jpg, .jpeg"
           >
-            <Button type="primary" icon={<UploadOutlined />}>Upload da Imagem</Button>
+            <Button type="primary" icon={<UploadOutlined />}>
+              Upload da Imagem
+            </Button>
           </Upload>
         );
 
-      case "switch": // 🔹 Adicionado suporte ao Switch para booleanos
+      case "switch":
         return (
           <Switch
-            checked={value as boolean} // Garantir que value seja booleano
+            checked={value as boolean}
             onChange={(val) => onChange(field.name, val)}
           />
         );

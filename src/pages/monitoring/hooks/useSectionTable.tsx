@@ -1,56 +1,75 @@
 import { useEffect, useState } from "react";
-import { useSectionStore } from "@/store/sectionStore";
 import { message } from "antd";
-import { SectionItem } from "@/types/sections";
+import { useSectionStore } from "@/store/sectionStore";
 import { useIoTDevices } from "@/hooks/useIoTDevices";
+import { SectionItem } from "@/types/sections";
+import { useSectionHierarchy } from "./useSectionHierarchy";
 
 export const useSectionTable = () => {
-  const { sections, fetchSections, deleteSection, updateSection } = useSectionStore();
-  const [loading, setLoading] = useState(true);
-  const [selectedSection, setSelectedSection] = useState<SectionItem | null>(null);
-  const [configureVisible, setConfigureVisible] = useState(false);
+  // Stores
+  const {
+    sections,
+    fetchSections,
+    deleteSection,
+    updateSection,
+    loading,
+  } = useSectionStore();
+
   const { devices, fetchDevices } = useIoTDevices();
 
+  // Estados locais
+  const [sectionToConfigure, setSectionToConfigure] = useState<SectionItem | null>(null);
+  const [isConfigureModalVisible, setIsConfigureModalVisible] = useState(false);
+
+  // Carregamento inicial
   useEffect(() => {
-    const fetchData = async () => {
+    const loadData = async () => {
       try {
-        setLoading(true);
-        await fetchSections();
-        await fetchDevices();
+        await Promise.all([fetchSections(), fetchDevices()]);
       } catch (error) {
-        message.error("Erro ao carregar seções.");
-      } finally {
-        setLoading(false);
+        message.error("Erro ao carregar seções ou dispositivos.");
       }
     };
 
-    fetchData();
-  }, [fetchSections]);
+    loadData();
+  }, [fetchSections, fetchDevices]);
 
-  const handleConfigure = (section: SectionItem) => {
-    setSelectedSection(section);
-    setConfigureVisible(true);
+  // Processa hierarquia das seções
+  const { setoresPrincipais, filteredSections } = useSectionHierarchy(sections);
+
+  // Abrir modal de configuração
+  const handleOpenConfigure = (section: SectionItem) => {
+    setSectionToConfigure(section);
+    setIsConfigureModalVisible(true);
   };
 
+  // Fechar modal
+  const handleCloseConfigure = () => {
+    setIsConfigureModalVisible(false);
+    setSectionToConfigure(null);
+  };
+
+  // Salvar configuração de uma seção
   const handleSaveConfigure = async (data: Partial<SectionItem>) => {
-    if (!selectedSection) return;
+    if (!sectionToConfigure) return;
 
     try {
       const updatedData: Partial<SectionItem> = {
-        ...selectedSection,
+        ...sectionToConfigure,
         is_monitored: data.is_monitored,
         DeviceIot: data.is_monitored ? data.DeviceIot : null,
       };
 
-      await updateSection(selectedSection.id, updatedData);
+      await updateSection(sectionToConfigure.id, updatedData);
       message.success("Seção configurada com sucesso.");
-      setConfigureVisible(false);
+      handleCloseConfigure();
     } catch (error) {
-      message.error("Erro ao configurar seção.");
       console.error(error);
+      message.error("Erro ao configurar seção.");
     }
   };
 
+  // Colunas da tabela
   const baseColumns = [
     {
       title: "Nome",
@@ -72,12 +91,14 @@ export const useSectionTable = () => {
 
   return {
     columns: baseColumns,
-    sections,
+    sections: filteredSections,
+    setoresPrincipais,
     loading,
-    configureVisible,
-    selectedSection,
-    setConfigureVisible,
-    handleConfigure,
+    sectionToConfigure,
+    isConfigureModalVisible,
+    setIsConfigureModalVisible,
+    handleOpenConfigure,
+    handleCloseConfigure,
     handleSaveConfigure,
     deleteSection,
     devices,

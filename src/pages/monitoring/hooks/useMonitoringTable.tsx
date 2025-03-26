@@ -43,21 +43,21 @@ export const useMonitoringTable = () => {
       key: "estimated_consumption",
     },
     {
-        title: "Ações",
-        key: "actions",
-        render: (_: any, record: MonitoringItem) => (
-          <Actions
-            onEdit={() => navigate(`/monitoring/configure/${record.id}`)} // 🔹 Redireciona corretamente
-            onDelete={async () => {
-              if (record.id) {
-                await deleteMonitoring(record.id);
-                message.success("Monitoramento excluído.");
-              }
-            }}
-          />
-        ),
-      }
-      
+      title: "Ações",
+      key: "actions",
+      render: (_: any, record: MonitoringItem) => (
+        <Actions
+          onEdit={() => navigate(`/monitoring/edit/${record.id}`)} // Edita monitoramento
+          onConfigure={() => navigate(`/monitoring/configure/${record.id}`)} // 🔧 Vai pra configuração de seções
+          onDelete={async () => {
+            if (record.id) {
+              await deleteMonitoring(record.id);
+              message.success("Monitoramento excluído.");
+            }
+          }}
+        />
+      ),
+    }
   ];
 
   return { columns, monitorings, loading };

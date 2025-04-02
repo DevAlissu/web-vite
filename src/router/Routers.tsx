@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useParams, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // Home e Login
 import HomePage from "../pages/home/Home";
@@ -38,7 +38,8 @@ import MonitoringPage from "../pages/monitoring/Monitoring";
 import MonitoringRegister from "../pages/monitoring/components/MonitoringForm";
 import MonitoringConfigure from "../pages/monitoring/components/MonitoringConfigure";
 import MonitoringAddSection from "../pages/monitoring/components/MonitoringAddSection";
-
+import MonitoringEdit from "../pages/monitoring/components/MonitoringEdit";
+import SectionEdit from "../pages/monitoring/components/SectionEdit";
 // Seções dentro do Monitoramento
 import SectionList from "../pages/monitoring/components/SectionList";
 
@@ -52,91 +53,81 @@ import MissionsPage from "../pages/missions/Missions";
 import MissionRegister from "../pages/missions/missionregister/Register";
 import EditMission from "../pages/missions/components/EditMission";
 
+// ProtectedRoute
+import ProtectedRoute from "./ProtectedRoute";
+
 const Routers = () => {
   return (
     <Routes>
+      {/* Rota pública (login) */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/home" element={<HomePage />} />
 
-      {/* Produtos */}
-      <Route path="/products" element={<ProductsPage />} />
-      <Route path="/products/register" element={<ProductsRegister />} />
-      <Route path="/products/edit/:id" element={<EditProducts />} />
+      {/* Rotas protegidas */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <Routes>
+              <Route path="/home" element={<HomePage />} />
 
-      {/* Equipamentos */}
-      <Route path="/equipments" element={<EquipmentsPage />} />
-      <Route path="/equipments/register" element={<EquipmentsRegister />} />
-      <Route path="/equipments/edit/:id" element={<EditEquipments />} />
+              {/* Produtos */}
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/products/register" element={<ProductsRegister />} />
+              <Route path="/products/edit/:id" element={<EditProducts />} />
 
-      {/* Usuários */}
-      <Route path="/users" element={<UsersPage />} />
-      <Route path="/users/register" element={<UsersRegister />} />
+              {/* Equipamentos */}
+              <Route path="/equipments" element={<EquipmentsPage />} />
+              <Route path="/equipments/register" element={<EquipmentsRegister />} />
+              <Route path="/equipments/edit/:id" element={<EditEquipments />} />
 
-      {/* Setores */}
-      <Route path="/sectors" element={<SectorsPage />} />
-      <Route path="/sectors/register" element={<SectorsRegister />} />
-      <Route path="/sectors/edit/:id" element={<SectorsEdit />} />
+              {/* Usuários */}
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/users/register" element={<UsersRegister />} />
 
-      {/* Dispositivos IoT */}
-      <Route path="/iotdevices" element={<IoTDevice />} />
-      <Route path="/iotdevices/register" element={<IoTDeviceRegister />} />
-      <Route path="/iotdevices/edit/:id" element={<IoTDeviceEdit />} />
+              {/* Setores */}
+              <Route path="/sectors" element={<SectorsPage />} />
+              <Route path="/sectors/register" element={<SectorsRegister />} />
+              <Route path="/sectors/edit/:id" element={<SectorsEdit />} />
 
-      {/* Linhas de Produção */}
-      <Route path="/production-lines" element={<ProductionLinesPage />} />
-      <Route path="/production-lines/register" element={<ProductionLinesRegister />} />
-      <Route path="/production-lines/edit/:id" element={<ProductionLinesEdit />} />
+              {/* Dispositivos IoT */}
+              <Route path="/iotdevices" element={<IoTDevice />} />
+              <Route path="/iotdevices/register" element={<IoTDeviceRegister />} />
+              <Route path="/iotdevices/edit/:id" element={<IoTDeviceEdit />} />
 
-      {/* Monitoramento */}
-      <Route path="/monitoring" element={<MonitoringPage />} />
-      <Route path="/monitoring/register" element={<MonitoringRegister />} />
-      <Route path="/monitoring/configure/:id" element={<MonitoringConfigure />} />
+              {/* Linhas de Produção */}
+              <Route path="/production-lines" element={<ProductionLinesPage />} />
+              <Route path="/production-lines/register" element={<ProductionLinesRegister />} />
+              <Route path="/production-lines/edit/:id" element={<ProductionLinesEdit />} />
 
-      {/* Seções dentro do Monitoramento */}
-      <Route path="/monitoring/configure/:id/sections" element={<SectionListWrapper />} />
+              {/* Monitoramento */}
+              <Route path="/monitoring" element={<MonitoringPage />} />
+              <Route path="/monitoring/register" element={<MonitoringRegister />} />
+              <Route path="/monitoring/configure/:id" element={<MonitoringConfigure />} />
+              <Route path="/monitoring/edit-section/:id" element={<SectionEdit />} />
+              {/* Seções dentro do Monitoramento */}
+              <Route path="/monitoring/configure/:id/sections" element={<SectionList />} />
 
-      {/* Adicionar Seção */}
-      <Route path="/monitoring/add-section/:id" element={<MonitoringAddSectionWrapper />} />
+              {/* Adicionar Seção */}
+              <Route path="/monitoring/add-section/:id" element={<MonitoringAddSection />} />
+              <Route path="/monitoring/edit/:id" element={<MonitoringEdit />} />
+              {/* Quizzes */}
+              <Route path="/quizzes" element={<QuizzesPage />} />
+              <Route path="/quizzes/register" element={<QuizRegister />} />
+              <Route path="/quizzes/edit/:id" element={<EditQuiz />} />
 
-      {/* Quizzes */}
-      <Route path="/quizzes" element={<QuizzesPage />} />
-      <Route path="/quizzes/register" element={<QuizRegister />} />
-      <Route path="/quizzes/edit/:id" element={<EditQuiz />} />
+              {/* Missões */}
+              <Route path="/missions" element={<MissionsPage />} />
+              <Route path="/missions/register" element={<MissionRegister />} />
+              <Route path="/missions/edit/:id" element={<EditMission />} />
 
-      {/* Missões */}
-      <Route path="/missions" element={<MissionsPage />} />
-      <Route path="/missions/register" element={<MissionRegister />} />
-      <Route path="/missions/edit/:id" element={<EditMission />} />
-
-      <Route path="/" element={<Navigate to="/home" replace />} />
-      <Route path="*" element={<Navigate to="/home" replace />} />
-    </Routes>
-  );
-};
-
-// **Wrapper para Seções dentro do Monitoramento**
-const SectionListWrapper = () => {
-  const { id } = useParams();
-  if (!id) return <p>Erro: ID não encontrado.</p>;
-
-  return <SectionList monitoringId={parseInt(id)} />;
-};
-
-// **Wrapper para Adicionar Seção**
-const MonitoringAddSectionWrapper = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
-  if (!id) return <p>Erro: ID não encontrado.</p>;
-
-  return (
-    <div>
-      <MonitoringAddSection
-        visible={true}
-        onClose={() => navigate(`/monitoring/configure/${id}`)}
-        monitoringId={parseInt(id)}
+              {/* Rota padrão (redireciona para /home) */}
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="*" element={<Navigate to="/home" replace />} />
+            </Routes>
+          </ProtectedRoute>
+        }
       />
-    </div>
+    </Routes>
   );
 };
 

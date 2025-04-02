@@ -1,5 +1,3 @@
-// src/components/form/formTypes.ts
-
 // Definindo tipos permitidos para o campo 'type' do FormField
 export type FormFieldType = 
   "text" | 
@@ -12,7 +10,8 @@ export type FormFieldType =
   "password" | 
   "transfer" | 
   "checkbox" | 
-  "switch";
+  "switch" | 
+  "readonly"; // novo tipo para campos somente leitura
 
 // A interface que descreve o campo do formulário
 export interface FormField {
@@ -27,7 +26,6 @@ export interface FormField {
   onChange?: (value: any) => void; // Função de retorno de mudança (para atualizar o valor do campo)
   value?: string | number | boolean | null; // O valor atual do campo, pode ser qualquer um dos tipos
 }
-
 // Interface para o componente de formulário dinâmico
 export interface DynamicFormProps {
   fields: FormField[]; // Lista de campos do formulário

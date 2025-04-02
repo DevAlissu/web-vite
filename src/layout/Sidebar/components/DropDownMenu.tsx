@@ -1,38 +1,33 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { MenuOutlined } from "@ant-design/icons";
 import { Dropdown, Space, MenuProps } from "antd";
 import { Link } from "react-router-dom";
 
-const items: MenuProps["items"] = [
+const menuItems: MenuProps["items"] = [
+  { key: "/home", label: <Link to="/home">Home</Link> },
+  { key: "/products", label: <Link to="/products">Produtos</Link> },
+  { key: "/equipments", label: <Link to="/equipments">Equipamentos</Link> },
+  { key: "/users", label: <Link to="/users">Usuários</Link> },
+  { key: "/sectors", label: <Link to="/sectors">Setores</Link> },
+  { key: "/production-lines", label: <Link to="/production-lines">Linhas de Produção</Link> },
+  { key: "/iotdevices", label: <Link to="/iotdevices">Dispositivos IoT</Link> },
+  { key: "/monitoring", label: <Link to="/monitoring">Monitoramentos</Link> },
+  { key: "/quizzes", label: <Link to="/quizzes">Quizzes</Link> },
+  { key: "/missions", label: <Link to="/missions">Missões</Link> },
   {
-    key: "1",
-    label: <Link to="/">Home</Link>,
-  },
-  {
-    key: "2",
-    label: <Link to="/resume">Medições</Link>,
+    key: "logout",
+    label: <span style={{ color: "red", fontWeight: "bold" }}>Sair</span>,
   },
 ];
 
 const DropDownMenu: React.FC = () => {
-  const [open, setOpen] = useState<boolean>(false);
-
-  const handleMenuOpen = (flag: boolean) => {
-    setOpen(flag);
-    document.body.style.overflow = flag ? "hidden" : "auto"; // Bloqueia/desbloqueia a rolagem
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    document.body.style.overflow = "auto"; // Libera a rolagem ao fechar
-  };
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      {/* Camada de fundo para fechar ao clicar fora */}
       {open && (
         <div
-          onClick={handleClose}
+          onClick={() => setOpen(false)}
           style={{
             position: "fixed",
             top: 0,
@@ -46,7 +41,10 @@ const DropDownMenu: React.FC = () => {
       )}
 
       <Dropdown
-        menu={{ items }}
+        menu={{ items: menuItems }}
+        trigger={["click"]}
+        open={open}
+        onOpenChange={(flag) => setOpen(flag)}
         overlayStyle={{
           position: "fixed",
           top: 60,
@@ -55,21 +53,9 @@ const DropDownMenu: React.FC = () => {
           backgroundColor: "rgba(255, 255, 255, 0.9)",
           zIndex: 1000,
         }}
-        trigger={["click"]}
-        open={open}
-        onOpenChange={handleMenuOpen}
       >
-        <a
-          onClick={(e) => e.preventDefault()}
-          style={{ display: "block", width: "100%", cursor: "pointer" }}
-        >
-          <Space
-            style={{
-              justifyContent: "space-between",
-              width: "100%",
-              height: "50%",
-            }}
-          >
+        <a onClick={(e) => e.preventDefault()} style={{ display: "block", width: "100%", cursor: "pointer" }}>
+          <Space style={{ justifyContent: "space-between", width: "100%", height: "50%" }}>
             <MenuOutlined />
           </Space>
         </a>

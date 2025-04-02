@@ -4,6 +4,7 @@ import axios from "axios";
 export const BASE_URL = `http://inova-sistemas.ddns.net:20163/api`;
 
 
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },

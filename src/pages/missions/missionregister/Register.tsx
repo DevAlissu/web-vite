@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { message, Card, Input, Select, DatePicker, Button, Row, Col } from "antd";
+import { message, Card, Input, Select, DatePicker, Button, Row, Col, Switch } from "antd";
 import { useMissionStore } from "../../../store/missions";
 import { useMonitoringStore } from "../../../store/monitoringStore";
+import { useQuizStore } from "../../../store/quizzes";
+import { useProductsStore } from "../../../store/products";
 import ItemSideBar from "../../../layout/Sidebar/ItemSideBar";
 import ItemHeader from "../../../layout/Header/ItemHeader";
 import ItemHeaderCabecalho from "../../../layout/Header/components/ItemHeaderCabecalho";
@@ -14,20 +16,29 @@ const MissionRegister: React.FC = () => {
   const navigate = useNavigate();
   const { createMission } = useMissionStore();
   const { monitorings, fetchMonitorings } = useMonitoringStore();
+  const { quizzes, fetchQuizzes } = useQuizStore();
+  const { products, fetchProducts } = useProductsStore();
   const [loading, setLoading] = useState(false);
+
+  // Estado do formulário unificado
   const [formValues, setFormValues] = useState({
     name: "",
     description: "",
-    energy_meta: "" as string | number, // Aceita string inicial, mas será convertida
-    quantity_xp: "" as string | number, // Aceita string inicial, mas será convertida
+    energy_meta: "" as string | number,
+    quantity_xp: "" as string | number,
     status: "",
     date_start: null as Dayjs | null,
     date_end: null as Dayjs | null,
-    monitoring: null as number | null, // Campo para associar monitoramento
+    monitoring: null as number | null,
+    quiz: null as number | null,
+    isProductionLine: false,
+    product: null as number | null,
   });
 
   useEffect(() => {
-    fetchMonitorings(); // Carregar monitoramentos ao abrir a página
+    fetchMonitorings();
+    fetchQuizzes();
+    fetchProducts();
   }, []);
 
   const handleChange = (name: string, value: any) => {
@@ -44,8 +55,8 @@ const MissionRegister: React.FC = () => {
     try {
       await createMission({
         ...formValues,
-        energy_meta: Number(formValues.energy_meta), // Conversão para número
-        quantity_xp: Number(formValues.quantity_xp), // Conversão para número
+        energy_meta: Number(formValues.energy_meta),
+        quantity_xp: Number(formValues.quantity_xp),
         date_start: formValues.date_start ? formValues.date_start.format("YYYY-MM-DD") : null,
         date_end: formValues.date_end ? formValues.date_end.format("YYYY-MM-DD") : null,
       });
@@ -64,7 +75,10 @@ const MissionRegister: React.FC = () => {
       <div className="content-container">
         <ItemHeader />
         <main className="content">
-          <ItemHeaderCabecalho title="Cadastro de Missão" subTitle="Preencha os campos abaixo para cadastrar uma missão" />
+          <ItemHeaderCabecalho 
+            title="Cadastro de Missão" 
+            subTitle="Preencha os campos abaixo para cadastrar uma missão" 
+          />
 
           <Card>
             <Row gutter={16}>
@@ -159,6 +173,50 @@ const MissionRegister: React.FC = () => {
                   ))}
                 </Select>
               </Col>
+
+              <Col span={12}>
+                <label>Associar Quiz</label>
+                <Select
+                  placeholder="Selecione um quiz"
+                  value={formValues.quiz}
+                  onChange={(value) => handleChange("quiz", value)}
+                  style={{ width: "100%" }}
+                >
+                  {quizzes.map((quiz) => (
+                    <Option key={quiz.id} value={quiz.id}>
+                      {quiz.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Col>
+            </Row>
+
+            <Row gutter={16} style={{ marginTop: 16 }}>
+              <Col span={12}>
+                <label>É Ordem de Produção?</label>
+                <Switch 
+                  checked={formValues.isProductionLine}
+                  onChange={(checked) => handleChange("isProductionLine", checked)}
+                />
+              </Col>
+
+              {formValues.isProductionLine && (
+                <Col span={12}>
+                  <label>Associar Produto</label>
+                  <Select
+                    placeholder="Selecione um produto"
+                    value={formValues.product}
+                    onChange={(value) => handleChange("product", value)}
+                    style={{ width: "100%" }}
+                  >
+                    {products.map((product) => (
+                      <Option key={product.id} value={product.id}>
+                        {product.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </Col>
+              )}
             </Row>
 
             <div style={{ marginTop: 16, textAlign: "right" }}>

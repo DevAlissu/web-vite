@@ -1,4 +1,5 @@
-import { Table, Badge } from "antd";
+import { Table, Badge, Button, Tooltip } from "antd";
+import { ThunderboltOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSectionTable } from "../hooks/useSectionTable";
 import { useSectionHierarchy } from "../hooks/useSectionHierarchy";
@@ -25,24 +26,49 @@ const SectionList = () => {
   const { handleDelete } = useSectionActions();
   const { setoresPrincipais } = useSectionHierarchy(sections);
 
-  // Verifica se uma seção ou qualquer descendente possui IoT
+  // Verifica se uma seção ou qualquer descendente possui IoT (LED Verde)
   const hasIotDeviceRecursive = (section: SectionItem, allSections: SectionItem[]): boolean => {
     if (section.DeviceIot) return true;
     const children = allSections.filter((s) => s.secticon_parent === section.id);
     return children.some((child) => hasIotDeviceRecursive(child, allSections));
   };
 
-  // Substituir a coluna "Nome" para adicionar LED verde
+  // Verifica se a seção tem um dispositivo IoT diretamente associado (Ícone de Monitoramento)
+  const hasDirectIotDevice = (section: SectionItem): boolean => {
+    return !!section.DeviceIot;
+  };
+
+  // Função para lidar com o clique no ícone de monitoramento
+  const handleMonitorClick = (section: SectionItem) => {
+    console.log("🔍 Monitoramento da seção:", section.name);
+    // Aqui vamos abrir o mini modal futuramente
+  };
+
+  // Substitui a coluna "Nome" para adicionar LED verde e ícone de monitoramento
   const enhancedColumns = columns.map((col) => {
     if (col.key === "name") {
       return {
         ...col,
         render: (_: unknown, record: SectionItem) => {
           const hasIot = hasIotDeviceRecursive(record, sections);
+          const hasDirectIot = hasDirectIotDevice(record);
+
           return (
-            <span>
+            <span style={{ display: "flex", alignItems: "center" }}>
+              {/* LED Verde para toda a árvore */}
               {hasIot && <Badge status="success" style={{ marginRight: 6 }} />}
               {record.name}
+              {/* Ícone de Monitoramento apenas para a seção diretamente associada */}
+              {hasDirectIot && (
+                <Tooltip title="Monitoramento Ativo">
+                  <Button
+                    type="text"
+                    icon={<ThunderboltOutlined />}
+                    onClick={() => handleMonitorClick(record)}
+                    style={{ marginLeft: 8, color: "#faad14" }}
+                  />
+                </Tooltip>
+              )}
             </span>
           );
         },
@@ -71,6 +97,7 @@ const SectionList = () => {
               allSections={sections}
               onConfigure={handleOpenConfigure}
               onDelete={handleDelete}
+              onMonitor={handleMonitorClick}
             />
           ),
         }}

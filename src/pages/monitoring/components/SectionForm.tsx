@@ -29,12 +29,7 @@ const SectionForm: React.FC<SectionFormProps> = ({
   return (
     <DynamicForm
       fields={[
-        {
-          name: "name",
-          label: "Nome da Seção",
-          type: "input",
-          required: true,
-        },
+       
         {
           name: "is_monitored",
           label: "Monitorado?",

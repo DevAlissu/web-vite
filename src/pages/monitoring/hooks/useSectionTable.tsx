@@ -72,7 +72,7 @@ export const useSectionTable = () => {
   // Colunas da tabela
   const baseColumns = [
     {
-      title: "Nome",
+      title: "Seção",
       dataIndex: "name",
       key: "name",
       sorter: (a: SectionItem, b: SectionItem) => a.name.localeCompare(b.name),

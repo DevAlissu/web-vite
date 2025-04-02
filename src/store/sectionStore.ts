@@ -11,10 +11,16 @@ interface SectionState {
   deleteSection: (id: number) => Promise<void>;
 }
 
+// Função auxiliar para tratar erros do Axios
+function isAxiosError(error: unknown): error is { response: { data: any } } {
+  return typeof error === "object" && error !== null && "response" in error;
+}
+
 export const useSectionStore = create<SectionState>((set, get) => ({
   sections: [],
   loading: false,
 
+  // Função para buscar todas as seções e construir a hierarquia
   fetchSections: async () => {
     set({ loading: true });
 
@@ -22,13 +28,13 @@ export const useSectionStore = create<SectionState>((set, get) => ({
       const response = await api.get<SectionItem[]>("/sections/");
       const allSections = response.data;
 
-      // Cria um mapa com todas as seções, adicionando `sections_filhas` vazias
+      // Criação do mapa de seções com `sections_filhas` vazias
       const sectionMap: Record<number, SectionItem> = {};
       allSections.forEach((section) => {
         sectionMap[section.id] = { ...section, sections_filhas: [] };
       });
 
-      // Constrói a hierarquia pai → filhos
+      // Construção da hierarquia pai → filhos
       const rootSections: SectionItem[] = [];
       allSections.forEach((section) => {
         if (section.secticon_parent) {
@@ -44,43 +50,75 @@ export const useSectionStore = create<SectionState>((set, get) => ({
       set({ sections: rootSections });
       console.log("✅ Seções carregadas com hierarquia:", rootSections);
     } catch (error) {
-      console.error("❌ Erro ao buscar seções:", error);
+      if (isAxiosError(error)) {
+        console.error("❌ Erro ao buscar seções:", error.response.data);
+      } else {
+        console.error("❌ Erro ao buscar seções:", String(error));
+      }
     } finally {
       set({ loading: false });
     }
   },
 
+  // Função para adicionar uma nova seção
   addSection: async (data) => {
     try {
       if (!data.type_section || typeof data.type_section !== "number") {
         throw new Error("`type_section` deve ser um ID numérico.");
       }
-  
-      const response = await api.post("/sections/", data);
+
+      const response = await api.post("/sections/", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       console.log("✅ Seção criada:", response.data);
       await get().fetchSections();
     } catch (error) {
-      console.error("❌ Erro ao adicionar seção:", error);
+      if (isAxiosError(error)) {
+        console.error("❌ Erro ao adicionar seção:", error.response.data);
+      } else {
+        console.error("❌ Erro ao adicionar seção:", String(error));
+      }
     }
   },
 
+  // Função para atualizar uma seção existente
   updateSection: async (id, data) => {
     try {
-      await api.put(`/sections/${id}/`, data);
-      console.log(`✅ Seção ${id} atualizada.`);
+      // Garantindo que o campo description tenha um valor padrão
+      if (typeof data.description !== "string") {
+        data.description = data.description || "";
+      }
+
+      const response = await api.patch(`/sections/${id}/`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(`✅ Seção ${id} atualizada com sucesso:`, response.data);
       await get().fetchSections();
     } catch (error) {
-      console.error("❌ Erro ao atualizar seção:", error);
+      if (isAxiosError(error)) {
+        console.error("❌ Erro ao atualizar seção:", error.response.data);
+      } else {
+        console.error("❌ Erro ao atualizar seção:", String(error));
+      }
     }
   },
 
+  // Função para deletar uma seção
   deleteSection: async (id) => {
     try {
       await api.delete(`/sections/${id}/`);
       console.log(`🗑️ Seção ${id} excluída.`);
       await get().fetchSections();
     } catch (error) {
-      console.error("❌ Erro ao excluir seção:", error);
+      if (isAxiosError(error)) {
+        console.error("❌ Erro ao excluir seção:", error.response.data);
+      } else {
+        console.error("❌ Erro ao excluir seção:", String(error));
+      }
     }
   },
 }));

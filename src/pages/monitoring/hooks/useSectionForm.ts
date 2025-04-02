@@ -69,37 +69,37 @@ export const useSectionForm = (isEdit = false) => {
           deviceIot: value ? prev.deviceIot : null,
         };
       }
-
+  
       if (name === "type_section") {
         return {
           ...prev,
           type_section: value as SectionFormValues["type_section"],
           section_consume: null,
-          name: "",
+          name: "", // Limpa o nome para ser atualizado com a seção de consumo
           deviceIot: null,
         };
       }
-
+  
       if (name === "section_consume") {
         const label = getSelectedLabelFromId(formValues.type_section, value as number);
-
-        // 🧠 Se estiver no modo edição, atualiza as seções ao trocar o setor base
+  
         if (isEdit) fetchSections();
-
+  
         return {
           ...prev,
           section_consume: value as number,
-          name: label ? `Seção: ${label}` : prev.name,
+          name: label ? label : prev.name, // Atualiza o nome automaticamente
           deviceIot: null,
         };
       }
-
+  
       return {
         ...prev,
         [name]: value,
       };
     });
   };
+  
 
   const getAvailableSections = () => {
     switch (formValues.type_section) {

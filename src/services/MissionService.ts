@@ -8,8 +8,27 @@ export const getMissions = async (): Promise<MissionItem[]> => {
 };
 
 // 🔹 Criar uma nova missão
+// 🔹 Criar uma nova missão
 export const createMission = async (missionData: Partial<MissionItem>) => {
-  return await api.post("/missions/", missionData);
+  try {
+    // Garantindo que todos os campos obrigatórios estejam no formato correto
+    const formattedData = {
+      name: missionData.name || "",
+      description: missionData.description || "",
+      quantity_na: missionData.quantity_na ?? 0,
+      energy_meta: missionData.energy_meta ?? 0,
+      quantity_xp: missionData.quantity_xp ?? 0,
+      status: missionData.status || "pendente",
+      date_start: missionData.date_start || new Date().toISOString().split("T")[0], // Data atual como fallback
+      date_end: missionData.date_end || new Date().toISOString().split("T")[0],
+      monitoring: missionData.monitoring ?? null,
+    };
+
+    return await api.post("/missions/", formattedData);
+  } catch (error) {
+    console.error("Erro ao criar missão", error);
+    throw error;
+  }
 };
 
 // 🔹 Atualizar uma missão existente

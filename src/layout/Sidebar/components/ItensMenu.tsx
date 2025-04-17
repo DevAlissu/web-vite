@@ -5,6 +5,7 @@ import { useAuth } from "../../../contexts/auth/AuthContext";
 
 // Ícones
 import HomeIcon from "@mui/icons-material/Home";
+import ThunderboltOutlined from "@ant-design/icons";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
@@ -71,7 +72,22 @@ const ItensMenu: React.FC = () => {
       key: "/monitoring",
       icon: <MonitorIcon fontSize="small" style={{ color: "#004281" }} />,
       label: "Monitoramentos",
-      onClick: () => navigate("/monitoring"),
+      
+      children: [
+        {
+          key: "/equipments/list",
+          icon: <MemoryIcon fontSize="small" style={{ color: "#004281" }} />,
+          label: "Energia",
+          onClick: () => navigate("/monitoring"),
+        },
+        {
+          key: "/equipments/types",
+          label: "Luminosidade",
+          icon: <MemoryIcon fontSize="small" style={{ color: "#004281" }} />,
+          onClick: () => navigate("/monitoring"),
+        },
+        
+      ],
     },
     {
       key: "/quizzes",

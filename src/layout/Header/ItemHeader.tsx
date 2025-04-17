@@ -7,10 +7,10 @@ export default function ItemHeader() {
   return (
     <Header
       style={{
-        padding: "0 20px",
+        padding: "0 0px",
         background: "rgb(0 66 129)",
         borderBottom: "1px solid #e8e8e8",
-        height: 64, // Mantém altura fixa para alinhar com o Sidebar
+        height: 65, // Mantém altura fixa para alinhar com o Sidebar
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",

@@ -34,7 +34,7 @@ const ItemSideBar: React.FC = () => {
       style={{
         background: "#FFF",
         minHeight: "100vh",
-        borderRight: "2px solid #e8e8e8",
+        borderRight: "0px solid #e8e8e8",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",

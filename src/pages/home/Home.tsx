@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout, Select, DatePicker, Checkbox, Row, Col, Card, Divider } from "antd";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import ItemHeader from "../../layout/Header/ItemHeader";
@@ -6,6 +6,8 @@ import ItemSideBar from "../../layout/Sidebar/ItemSideBar";
 
 import '../../styles/custom/custom.css';
 import { DashboardOutlined, HddOutlined, HomeOutlined, NodeExpandOutlined, PartitionOutlined, ProductOutlined } from "@ant-design/icons";
+
+import { useMonitoringStore } from "../../store/monitoringStore";
 
 
 
@@ -22,6 +24,20 @@ const mockData = [
 
 const HomePage: React.FC = () => {
   const [selectedMonitoramento, setSelectedMonitoramento] = useState<string[]>([]);
+  const [countMonitoring, setCountMonitoring] = useState(0);
+
+  const {fetchCountMonitorings} = useMonitoringStore()
+
+  useEffect(() => {
+
+    const loadData = async () => {
+      const resposta = await fetchCountMonitorings();
+      console.log(resposta)
+      setCountMonitoring(resposta);
+   };
+   loadData()
+
+  }, []);
 
   const handleMonitoramentoChange = (checkedValues: any) => {
     setSelectedMonitoramento(checkedValues);
@@ -45,9 +61,9 @@ const HomePage: React.FC = () => {
                   <div>
 
                     <DashboardOutlined style={{ color: "rgb(0, 66, 129)", fontSize: "24px" }} />
-                    <h1 className="card_content_title">Monitoramentos Em Andamento</h1>
+                    <h1 className="card_content_title">Monitoramentos Ativos</h1>
                   </div>
-                  <span className="card_conten_value">5</span>
+                  <span className="card_conten_value">{countMonitoring}</span>
                 </div>
               </Card>
             </Col>

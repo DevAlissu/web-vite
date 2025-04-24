@@ -9,6 +9,7 @@ interface MonitoringState {
   createMonitoring: (data: Partial<MonitoringItem>) => Promise<void>;
   updateMonitoring: (id: number, data: Partial<MonitoringItem>) => Promise<void>;
   deleteMonitoring: (id: number) => Promise<void>;
+  fetchCountMonitorings: () => Promise<number>;
 }
 
 export const useMonitoringStore = create<MonitoringState>((set) => ({
@@ -59,6 +60,16 @@ export const useMonitoringStore = create<MonitoringState>((set) => ({
       }));
     } catch (error) {
       console.error("Erro ao excluir monitoramento:", error);
+    }
+  },
+
+  fetchCountMonitorings: async () => {
+    try {
+      const response = await api.get<number>("/monitoring-active-count/");
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar quantidade de monitoramentos:", error);
+      return 0;
     }
   },
 }));

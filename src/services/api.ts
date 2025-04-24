@@ -1,8 +1,8 @@
 import axios from "axios";
 
 
-//export const BASE_URL = `http://localhost:10000/api/`;
-export const BASE_URL = `http://inova-sistemas.ddns.net:20163/api`;
+export const BASE_URL = `http://localhost:10000/api/`;
+//export const BASE_URL = `http://inova-sistemas.ddns.net:20163/api`;
 
 
 const api = axios.create({

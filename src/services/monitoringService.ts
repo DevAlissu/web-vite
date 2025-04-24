@@ -13,6 +13,11 @@ export const getMonitoringById = async (id: number): Promise<MonitoringItem> => 
   return response.data;
 };
 
+export const getMonitoringsCountActive = async (): Promise<number> => {
+   const response = await api.get("/monitoring-active-count/");
+   return response.data;
+}
+
 // Criar um novo monitoramento
 export const createMonitoring = async (monitoring: Partial<MonitoringItem>): Promise<void> => {
   await api.post("/monitorings/", monitoring);

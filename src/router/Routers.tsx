@@ -1,3 +1,4 @@
+// src/router/Routers.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
 
 // Home e Login
@@ -33,15 +34,27 @@ import ProductionLinesPage from "../pages/productionLines/ProductionLines";
 import ProductionLinesRegister from "../pages/productionLines/components/ProductionLinesRegister";
 import ProductionLinesEdit from "../pages/productionLines/components/ProductionLinesEdit";
 
-// Monitoramento
+// Monitoramento (NansenIC)
 import MonitoringPage from "../pages/monitoring/Monitoring";
 import MonitoringRegister from "../pages/monitoring/components/MonitoringForm";
 import MonitoringConfigure from "../pages/monitoring/components/MonitoringConfigure";
 import MonitoringAddSection from "../pages/monitoring/components/MonitoringAddSection";
 import MonitoringEdit from "../pages/monitoring/components/MonitoringEdit";
 import SectionEdit from "../pages/monitoring/components/SectionEdit";
-// Seções dentro do Monitoramento
 import SectionList from "../pages/monitoring/components/SectionList";
+
+// Monitoramento (NansenSensor – mock)
+import MonitoringSensor from "../pages/monitoring-sensor/MonitoringSensor";
+import MonitoringSensorForm from "../pages/monitoring-sensor/components/MonitoringForm";
+import SectionListSensor from "../pages/monitoring-sensor/components/SectionList";
+import MonitoringAddSectionSensor from "../pages/monitoring-sensor/components/MonitoringAddSection";
+import MonitoringSensorEdit from "../pages/monitoring-sensor/components/MonitoringEdit";
+import SectionEditSensor from "../pages/monitoring-sensor/components/SectionEdit";
+
+// Loja (corrigido ✅)
+import LojaProductsPage from "../pages/loja/LojaProducts";
+import LojaProductsRegister from "../pages/loja/LojaProductsRegister";
+import LojaProductsEdit from "../pages/loja/LojaProductsEdit";
 
 // Quizzes
 import QuizzesPage from "../pages/quizzes/Quizzes";
@@ -56,79 +69,131 @@ import EditMission from "../pages/missions/components/EditMission";
 // ProtectedRoute
 import ProtectedRoute from "./ProtectedRoute";
 
-const Routers = () => {
-  return (
-    <Routes>
-      {/* Rota pública (login) */}
-      <Route path="/login" element={<LoginPage />} />
+const Routers = () => (
+  <Routes>
+    {/* Rota pública (login) */}
+    <Route path="/login" element={<LoginPage />} />
 
-      {/* Rotas protegidas */}
-      <Route
-        path="/*"
-        element={
-          <ProtectedRoute>
-            <Routes>
-              <Route path="/home" element={<HomePage />} />
+    {/* Rotas protegidas */}
+    <Route
+      path="/*"
+      element={
+        <ProtectedRoute>
+          <Routes>
+            {/* Home */}
+            <Route path="/home" element={<HomePage />} />
 
-              {/* Produtos */}
-              <Route path="/products" element={<ProductsPage />} />
-              <Route path="/products/register" element={<ProductsRegister />} />
-              <Route path="/products/edit/:id" element={<EditProducts />} />
+            {/* Produtos */}
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/register" element={<ProductsRegister />} />
+            <Route path="/products/edit/:id" element={<EditProducts />} />
 
-              {/* Equipamentos */}
-              <Route path="/equipments" element={<EquipmentsPage />} />
-              <Route path="/equipments/register" element={<EquipmentsRegister />} />
-              <Route path="/equipments/edit/:id" element={<EditEquipments />} />
+            {/* Equipamentos */}
+            <Route path="/equipments" element={<EquipmentsPage />} />
+            <Route
+              path="/equipments/register"
+              element={<EquipmentsRegister />}
+            />
+            <Route path="/equipments/edit/:id" element={<EditEquipments />} />
 
-              {/* Usuários */}
-              <Route path="/users" element={<UsersPage />} />
-              <Route path="/users/register" element={<UsersRegister />} />
+            {/* Usuários */}
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/users/register" element={<UsersRegister />} />
 
-              {/* Setores */}
-              <Route path="/sectors" element={<SectorsPage />} />
-              <Route path="/sectors/register" element={<SectorsRegister />} />
-              <Route path="/sectors/edit/:id" element={<SectorsEdit />} />
+            {/* Setores */}
+            <Route path="/sectors" element={<SectorsPage />} />
+            <Route path="/sectors/register" element={<SectorsRegister />} />
+            <Route path="/sectors/edit/:id" element={<SectorsEdit />} />
 
-              {/* Dispositivos IoT */}
-              <Route path="/iotdevices" element={<IoTDevice />} />
-              <Route path="/iotdevices/register" element={<IoTDeviceRegister />} />
-              <Route path="/iotdevices/edit/:id" element={<IoTDeviceEdit />} />
+            {/* Dispositivos IoT */}
+            <Route path="/iotdevices" element={<IoTDevice />} />
+            <Route
+              path="/iotdevices/register"
+              element={<IoTDeviceRegister />}
+            />
+            <Route path="/iotdevices/edit/:id" element={<IoTDeviceEdit />} />
 
-              {/* Linhas de Produção */}
-              <Route path="/production-lines" element={<ProductionLinesPage />} />
-              <Route path="/production-lines/register" element={<ProductionLinesRegister />} />
-              <Route path="/production-lines/edit/:id" element={<ProductionLinesEdit />} />
+            {/* Linhas de Produção */}
+            <Route path="/production-lines" element={<ProductionLinesPage />} />
+            <Route
+              path="/production-lines/register"
+              element={<ProductionLinesRegister />}
+            />
+            <Route
+              path="/production-lines/edit/:id"
+              element={<ProductionLinesEdit />}
+            />
 
-              {/* Monitoramento */}
-              <Route path="/monitoring" element={<MonitoringPage />} />
-              <Route path="/monitoring/register" element={<MonitoringRegister />} />
-              <Route path="/monitoring/configure/:id" element={<MonitoringConfigure />} />
-              <Route path="/monitoring/edit-section/:id" element={<SectionEdit />} />
-              {/* Seções dentro do Monitoramento */}
-              <Route path="/monitoring/configure/:id/sections" element={<SectionList />} />
+            {/* Monitoramento (NansenIC) */}
+            <Route path="/monitoring" element={<MonitoringPage />} />
+            <Route
+              path="/monitoring/register"
+              element={<MonitoringRegister />}
+            />
+            <Route
+              path="/monitoring/configure/:id"
+              element={<MonitoringConfigure />}
+            />
+            <Route
+              path="/monitoring/configure/:id/sections"
+              element={<SectionList />}
+            />
+            <Route
+              path="/monitoring/add-section/:id"
+              element={<MonitoringAddSection />}
+            />
+            <Route path="/monitoring/edit/:id" element={<MonitoringEdit />} />
+            <Route
+              path="/monitoring/edit-section/:id"
+              element={<SectionEdit />}
+            />
 
-              {/* Adicionar Seção */}
-              <Route path="/monitoring/add-section/:id" element={<MonitoringAddSection />} />
-              <Route path="/monitoring/edit/:id" element={<MonitoringEdit />} />
-              {/* Quizzes */}
-              <Route path="/quizzes" element={<QuizzesPage />} />
-              <Route path="/quizzes/register" element={<QuizRegister />} />
-              <Route path="/quizzes/edit/:id" element={<EditQuiz />} />
+            {/* Monitoramento (NansenSensor – mock) */}
+            <Route path="/sensor-monitoring" element={<MonitoringSensor />} />
+            <Route
+              path="/sensor-monitoring/register"
+              element={<MonitoringSensorForm />}
+            />
+            <Route
+              path="/sensor-monitoring/configure/:id"
+              element={<SectionListSensor />}
+            />
+            <Route
+              path="/sensor-monitoring/add-section/:id"
+              element={<MonitoringAddSectionSensor />}
+            />
+            <Route
+              path="/sensor-monitoring/edit/:id"
+              element={<MonitoringSensorEdit />}
+            />
+            <Route
+              path="/sensor-monitoring/edit-section/:id"
+              element={<SectionEditSensor />}
+            />
 
-              {/* Missões */}
-              <Route path="/missions" element={<MissionsPage />} />
-              <Route path="/missions/register" element={<MissionRegister />} />
-              <Route path="/missions/edit/:id" element={<EditMission />} />
+            {/* Loja (corrigido ✅) */}
+            <Route path="/loja" element={<LojaProductsPage />} />
+            <Route path="/loja/register" element={<LojaProductsRegister />} />
+            <Route path="/loja/edit/:id" element={<LojaProductsEdit />} />
 
-              {/* Rota padrão (redireciona para /home) */}
-              <Route path="/" element={<Navigate to="/home" replace />} />
-              <Route path="*" element={<Navigate to="/home" replace />} />
-            </Routes>
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
-  );
-};
+            {/* Quizzes */}
+            <Route path="/quizzes" element={<QuizzesPage />} />
+            <Route path="/quizzes/register" element={<QuizRegister />} />
+            <Route path="/quizzes/edit/:id" element={<EditQuiz />} />
+
+            {/* Missões */}
+            <Route path="/missions" element={<MissionsPage />} />
+            <Route path="/missions/register" element={<MissionRegister />} />
+            <Route path="/missions/edit/:id" element={<EditMission />} />
+
+            {/* Rota padrão */}
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Routes>
+        </ProtectedRoute>
+      }
+    />
+  </Routes>
+);
 
 export default Routers;

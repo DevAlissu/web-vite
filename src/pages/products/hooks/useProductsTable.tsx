@@ -37,13 +37,23 @@ export const useProductsTable = () => {
           <img
             src={photo}
             alt="Produto"
-            style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "5px" }}
+            style={{
+              width: "50px",
+              height: "50px",
+              objectFit: "cover",
+              borderRadius: "5px",
+            }}
           />
         ) : photo ? (
           <img
             src={`http://inova-sistemas.ddns.net:20163${photo}`}
             alt="Produto"
-            style={{ width: "540px", height: "540px", objectFit: "cover", borderRadius: "5px" }}
+            style={{
+              width: "540px",
+              height: "540px",
+              objectFit: "cover",
+              borderRadius: "5px",
+            }}
           />
         ) : (
           <span>Sem imagem</span>
@@ -55,13 +65,17 @@ export const useProductsTable = () => {
       key: "name",
       sorter: (a: ProductItem, b: ProductItem) => a.name.localeCompare(b.name),
       sortDirections: ["ascend", "descend"] as SortOrder[],
-      render: (text: string | undefined) => <strong>{text ?? "Sem nome"}</strong>,
+      render: (text: string | undefined) => (
+        <strong>{text ?? "Sem nome"}</strong>
+      ),
     },
     {
       title: "Descrição",
       dataIndex: "description",
       key: "description",
-      render: (text: string | undefined) => <span>{text ?? "Sem descrição"}</span>,
+      render: (text: string | undefined) => (
+        <span>{text ?? "Sem descrição"}</span>
+      ),
     },
     {
       title: "Ações",

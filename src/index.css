@@ -1,10 +1,10 @@
 @import "./styles/base/reset.css";
 @import "./styles/base/variables.css";
-@import "./styles/components/buttons.css"; 
+@import "./styles/components/buttons.css";
 
 @import "./styles/global/globals.css";
 @import "./styles/global/sidebar.css";
-@import "./styles/global/tables.css"; 
+@import "./styles/global/tables.css";
 @import "tailwindcss";
 
 :root {
@@ -15,7 +15,6 @@
   color-scheme: light dark;
   color: rgba(0, 0, 0, 0.87);
 
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -24,7 +23,7 @@
 
 body {
   margin: 0;
- 
+
   min-width: 320px;
   min-height: 100vh;
   background-color: #ffffff;
@@ -54,4 +53,15 @@ button {
 }
 button:hover {
   border-color: #646cff;
+}
+:where(.css-dev-only-do-not-override-1d4w9r2).ant-menu-light .ant-menu-item,
+:where(.css-dev-only-do-not-override-1d4w9r2).ant-menu-light
+  > .ant-menu
+  .ant-menu-item,
+:where(.css-dev-only-do-not-override-1d4w9r2).ant-menu-light
+  .ant-menu-submenu-title,
+:where(.css-dev-only-do-not-override-1d4w9r2).ant-menu-light
+  > .ant-menu
+  .ant-menu-submenu-titl {
+  color: #004281;
 }

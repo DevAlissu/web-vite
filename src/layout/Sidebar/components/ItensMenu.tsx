@@ -1,11 +1,11 @@
+import React from "react";
 import { Menu } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { MenuProps } from "antd/es/menu";
-import { useAuth } from "../../../contexts/auth/AuthContext"; 
+import { useAuth } from "../../../contexts/auth/AuthContext";
 
 // Ícones
 import HomeIcon from "@mui/icons-material/Home";
-import ThunderboltOutlined from "@ant-design/icons";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
@@ -14,102 +14,109 @@ import MemoryIcon from "@mui/icons-material/Memory";
 import MonitorIcon from "@mui/icons-material/Monitor";
 import QuizIcon from "@mui/icons-material/Quiz";
 import ExploreIcon from "@mui/icons-material/Explore";
-import FactoryIcon from "@mui/icons-material/Factory"; 
-import ExitToAppIcon from "@mui/icons-material/ExitToApp"; 
+import FactoryIcon from "@mui/icons-material/Factory";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 const ItensMenu: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth(); 
+  const { logout } = useAuth();
 
   const items: MenuProps["items"] = [
     {
       key: "/home",
-      icon: <HomeIcon fontSize="small" style={{ color: "#004281" }} />,
+      icon: <HomeIcon fontSize="small" />,
       label: "Home",
       onClick: () => navigate("/home"),
     },
     {
       key: "/sectors",
-      icon: <AccountTreeIcon fontSize="small" style={{ color: "#004281" }} />,
+      icon: <AccountTreeIcon fontSize="small" />,
       label: "Setores",
       onClick: () => navigate("/sectors"),
     },
     {
-      key: "/production-lines", // 🔹 Adicionada rota para linha de produção
-      icon: <FactoryIcon fontSize="small" style={{ color: "#004281" }} />,
+      key: "/production-lines",
+      icon: <FactoryIcon fontSize="small" />,
       label: "Linhas de Produção",
       onClick: () => navigate("/production-lines"),
     },
     {
       key: "/equipments",
-      icon: <BuildIcon fontSize="small" style={{ color: "#004281" }} />,
+      icon: <BuildIcon fontSize="small" />,
       label: "Equipamentos",
       onClick: () => navigate("/equipments"),
     },
     {
       key: "/products",
-      icon: <LocalOfferIcon fontSize="small" style={{ color: "#004281" }} />,
+      icon: <LocalOfferIcon fontSize="small" />,
       label: "Produtos",
       onClick: () => navigate("/products"),
     },
-    
     {
       key: "/users",
-      icon: <PeopleIcon fontSize="small" style={{ color: "#004281" }} />,
+      icon: <PeopleIcon fontSize="small" />,
       label: "Usuários",
       onClick: () => navigate("/users"),
     },
-    
-    
     {
       key: "/iotdevices",
-      icon: <MemoryIcon fontSize="small" style={{ color: "#004281" }} />,
+      icon: <MemoryIcon fontSize="small" />,
       label: "Dispositivos IoT",
       onClick: () => navigate("/iotdevices"),
     },
     {
-      key: "/monitoring",
-      icon: <MonitorIcon fontSize="small" style={{ color: "#004281" }} />,
+      key: "monitoring-group",
+      icon: <MonitorIcon fontSize="small" />,
       label: "Monitoramentos",
-      
       children: [
         {
-          key: "/equipments/list",
-          icon: <MemoryIcon fontSize="small" style={{ color: "#004281" }} />,
-          label: "Energia",
+          key: "/monitoring",
+          label: "Energia (NansenIC)",
           onClick: () => navigate("/monitoring"),
         },
         {
-          key: "/equipments/types",
-          label: "Luminosidade",
-          icon: <MemoryIcon fontSize="small" style={{ color: "#004281" }} />,
-          onClick: () => navigate("/monitoring"),
+          key: "/sensor-monitoring",
+          label: "Sensor (NansenSensor)",
+          onClick: () => navigate("/sensor-monitoring"),
         },
-        
+      ],
+    },
+    {
+      key: "loja-group",
+      icon: <ShoppingCartIcon fontSize="small" />,
+      label: "Loja",
+      children: [
+        {
+          key: "/loja",
+          label: "Produtos Loja",
+          onClick: () => navigate("/loja"),
+        },
+        {
+          key: "/loja/register",
+          label: "Cadastrar Produto",
+          onClick: () => navigate("/loja/register"),
+        },
       ],
     },
     {
       key: "/quizzes",
-      icon: <QuizIcon fontSize="small" style={{ color: "#004281" }} />,
+      icon: <QuizIcon fontSize="small" />,
       label: "Quizzes",
       onClick: () => navigate("/quizzes"),
     },
     {
       key: "/missions",
-      icon: <ExploreIcon fontSize="small" style={{ color: "#004281" }} />,
+      icon: <ExploreIcon fontSize="small" />,
       label: "Missões",
       onClick: () => navigate("/missions"),
     },
-    {
-      key: "divider",
-      type: "divider",
-    },
+    { key: "divider", type: "divider" },
     {
       key: "logout",
-      className: "logout-item",
       icon: <ExitToAppIcon fontSize="small" />,
-      label: <span style={{ color: "red", fontWeight: "bold" }}>Sair</span>,
+      label: <span style={{ color: "red" }}>Sair</span>,
       onClick: logout,
     },
   ];

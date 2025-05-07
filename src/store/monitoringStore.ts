@@ -7,7 +7,10 @@ interface MonitoringState {
   loading: boolean;
   fetchMonitorings: () => Promise<void>;
   createMonitoring: (data: Partial<MonitoringItem>) => Promise<void>;
-  updateMonitoring: (id: number, data: Partial<MonitoringItem>) => Promise<void>;
+  updateMonitoring: (
+    id: number,
+    data: Partial<MonitoringItem>
+  ) => Promise<void>;
   deleteMonitoring: (id: number) => Promise<void>;
   fetchCountMonitorings: () => Promise<number>;
 }

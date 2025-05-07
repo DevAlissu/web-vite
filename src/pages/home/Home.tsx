@@ -67,7 +67,9 @@ const HomePage: React.FC = () => {
     };
 
     if (selectedMonitoringId) {
-      fetchEnergy();
+      setInterval(() => {
+        fetchEnergy();
+      }, 10000);
     }
   }, [selectedMonitoringId, iotSections]);
 

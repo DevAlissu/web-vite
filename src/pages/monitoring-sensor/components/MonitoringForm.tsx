@@ -58,7 +58,7 @@ const MonitoringForm: React.FC = () => {
         <ItemHeader />
         <main className="content">
           <ItemHeaderCabecalho
-            title="Cadastro de Sensor (mock)"
+            title="Cadastro de Sensor"
             subTitle="Formulário para cadastro de sensor no NansenSensor"
           />
 

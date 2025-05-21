@@ -20,8 +20,8 @@ const MonitoringSensor: React.FC = () => {
         <ItemHeader />
         <main className="content">
           <ItemHeaderCabecalho
-            title="NansenSensor (mock)"
-            subTitle="Lista mock de NansenSensor"
+            title="Nansensor"
+            subTitle="Lista de NansenSensor"
           />
 
           <section className="actions-section">

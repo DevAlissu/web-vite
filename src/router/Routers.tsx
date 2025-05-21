@@ -1,5 +1,6 @@
 // src/router/Routers.tsx
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
 
 // Home e Login
 import HomePage from "../pages/home/Home";
@@ -40,8 +41,8 @@ import MonitoringRegister from "../pages/monitoring/components/MonitoringForm";
 import MonitoringConfigure from "../pages/monitoring/components/MonitoringConfigure";
 import MonitoringAddSection from "../pages/monitoring/components/MonitoringAddSection";
 import MonitoringEdit from "../pages/monitoring/components/MonitoringEdit";
-import SectionEdit from "../pages/monitoring/components/SectionEdit";
 import SectionList from "../pages/monitoring/components/SectionList";
+import SectionEdit from "../pages/monitoring/components/SectionEdit";
 
 // Monitoramento (NansenSensor – mock)
 import MonitoringSensor from "../pages/monitoring-sensor/MonitoringSensor";
@@ -51,7 +52,7 @@ import MonitoringAddSectionSensor from "../pages/monitoring-sensor/components/Mo
 import MonitoringSensorEdit from "../pages/monitoring-sensor/components/MonitoringEdit";
 import SectionEditSensor from "../pages/monitoring-sensor/components/SectionEdit";
 
-// Loja (corrigido ✅)
+// Loja
 import LojaProductsPage from "../pages/loja/LojaProducts";
 import LojaProductsRegister from "../pages/loja/LojaProductsRegister";
 import LojaProductsEdit from "../pages/loja/LojaProductsEdit";
@@ -65,135 +66,118 @@ import EditQuiz from "../pages/quizzes/components/EditQuiz";
 import MissionsPage from "../pages/missions/Missions";
 import MissionRegister from "../pages/missions/missionregister/Register";
 import EditMission from "../pages/missions/components/EditMission";
+export default function Routers() {
+  return (
+    <Routes>
+      {/* Rota pública */}
+      <Route path="/login" element={<LoginPage />} />
 
-// ProtectedRoute
-import ProtectedRoute from "./ProtectedRoute";
+      {/* Bloco de rotas protegidas */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <Outlet />
+          </ProtectedRoute>
+        }
+      >
+        {/* Home */}
+        <Route path="/home" element={<HomePage />} />
 
-const Routers = () => (
-  <Routes>
-    {/* Rota pública (login) */}
-    <Route path="/login" element={<LoginPage />} />
+        {/* Produtos */}
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/register" element={<ProductsRegister />} />
+        <Route path="/products/edit/:id" element={<EditProducts />} />
 
-    {/* Rotas protegidas */}
-    <Route
-      path="/*"
-      element={
-        <ProtectedRoute>
-          <Routes>
-            {/* Home */}
-            <Route path="/home" element={<HomePage />} />
+        {/* Equipamentos */}
+        <Route path="/equipments" element={<EquipmentsPage />} />
+        <Route path="/equipments/register" element={<EquipmentsRegister />} />
+        <Route path="/equipments/edit/:id" element={<EditEquipments />} />
 
-            {/* Produtos */}
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/products/register" element={<ProductsRegister />} />
-            <Route path="/products/edit/:id" element={<EditProducts />} />
+        {/* Usuários */}
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/users/register" element={<UsersRegister />} />
 
-            {/* Equipamentos */}
-            <Route path="/equipments" element={<EquipmentsPage />} />
-            <Route
-              path="/equipments/register"
-              element={<EquipmentsRegister />}
-            />
-            <Route path="/equipments/edit/:id" element={<EditEquipments />} />
+        {/* Setores */}
+        <Route path="/sectors" element={<SectorsPage />} />
+        <Route path="/sectors/register" element={<SectorsRegister />} />
+        <Route path="/sectors/edit/:id" element={<SectorsEdit />} />
 
-            {/* Usuários */}
-            <Route path="/users" element={<UsersPage />} />
-            <Route path="/users/register" element={<UsersRegister />} />
+        {/* Dispositivos IoT */}
+        <Route path="/iotdevices" element={<IoTDevice />} />
+        <Route path="/iotdevices/register" element={<IoTDeviceRegister />} />
+        <Route path="/iotdevices/edit/:id" element={<IoTDeviceEdit />} />
 
-            {/* Setores */}
-            <Route path="/sectors" element={<SectorsPage />} />
-            <Route path="/sectors/register" element={<SectorsRegister />} />
-            <Route path="/sectors/edit/:id" element={<SectorsEdit />} />
+        {/* Linhas de Produção */}
+        <Route path="/production-lines" element={<ProductionLinesPage />} />
+        <Route
+          path="/production-lines/register"
+          element={<ProductionLinesRegister />}
+        />
+        <Route
+          path="/production-lines/edit/:id"
+          element={<ProductionLinesEdit />}
+        />
 
-            {/* Dispositivos IoT */}
-            <Route path="/iotdevices" element={<IoTDevice />} />
-            <Route
-              path="/iotdevices/register"
-              element={<IoTDeviceRegister />}
-            />
-            <Route path="/iotdevices/edit/:id" element={<IoTDeviceEdit />} />
+        {/* Monitoramento (NansenIC) */}
+        <Route path="/monitoring" element={<MonitoringPage />} />
+        <Route path="/monitoring/register" element={<MonitoringRegister />} />
+        <Route
+          path="/monitoring/configure/:id"
+          element={<MonitoringConfigure />}
+        />
+        <Route
+          path="/monitoring/configure/:id/sections"
+          element={<SectionList />}
+        />
+        <Route
+          path="/monitoring/add-section/:id"
+          element={<MonitoringAddSection />}
+        />
+        <Route path="/monitoring/edit/:id" element={<MonitoringEdit />} />
+        <Route path="/monitoring/edit-section/:id" element={<SectionEdit />} />
 
-            {/* Linhas de Produção */}
-            <Route path="/production-lines" element={<ProductionLinesPage />} />
-            <Route
-              path="/production-lines/register"
-              element={<ProductionLinesRegister />}
-            />
-            <Route
-              path="/production-lines/edit/:id"
-              element={<ProductionLinesEdit />}
-            />
+        {/* Monitoramento (NansenSensor) */}
+        <Route path="/sensor-monitoring" element={<MonitoringSensor />} />
+        <Route
+          path="/sensor-monitoring/register"
+          element={<MonitoringSensorForm />}
+        />
+        <Route
+          path="/sensor-monitoring/configure/:id"
+          element={<SectionListSensor />}
+        />
+        <Route
+          path="/sensor-monitoring/add-section/:id"
+          element={<MonitoringAddSectionSensor />}
+        />
+        <Route
+          path="/sensor-monitoring/edit/:id"
+          element={<MonitoringSensorEdit />}
+        />
+        <Route
+          path="/sensor-monitoring/edit-section/:id"
+          element={<SectionEditSensor />}
+        />
 
-            {/* Monitoramento (NansenIC) */}
-            <Route path="/monitoring" element={<MonitoringPage />} />
-            <Route
-              path="/monitoring/register"
-              element={<MonitoringRegister />}
-            />
-            <Route
-              path="/monitoring/configure/:id"
-              element={<MonitoringConfigure />}
-            />
-            <Route
-              path="/monitoring/configure/:id/sections"
-              element={<SectionList />}
-            />
-            <Route
-              path="/monitoring/add-section/:id"
-              element={<MonitoringAddSection />}
-            />
-            <Route path="/monitoring/edit/:id" element={<MonitoringEdit />} />
-            <Route
-              path="/monitoring/edit-section/:id"
-              element={<SectionEdit />}
-            />
+        {/* Loja */}
+        <Route path="/loja" element={<LojaProductsPage />} />
+        <Route path="/loja/register" element={<LojaProductsRegister />} />
+        <Route path="/loja/edit/:id" element={<LojaProductsEdit />} />
 
-            {/* Monitoramento (NansenSensor – mock) */}
-            <Route path="/sensor-monitoring" element={<MonitoringSensor />} />
-            <Route
-              path="/sensor-monitoring/register"
-              element={<MonitoringSensorForm />}
-            />
-            <Route
-              path="/sensor-monitoring/configure/:id"
-              element={<SectionListSensor />}
-            />
-            <Route
-              path="/sensor-monitoring/add-section/:id"
-              element={<MonitoringAddSectionSensor />}
-            />
-            <Route
-              path="/sensor-monitoring/edit/:id"
-              element={<MonitoringSensorEdit />}
-            />
-            <Route
-              path="/sensor-monitoring/edit-section/:id"
-              element={<SectionEditSensor />}
-            />
+        {/* Quizzes */}
+        <Route path="/quizzes" element={<QuizzesPage />} />
+        <Route path="/quizzes/register" element={<QuizRegister />} />
+        <Route path="/quizzes/edit/:id" element={<EditQuiz />} />
 
-            {/* Loja (corrigido ✅) */}
-            <Route path="/loja" element={<LojaProductsPage />} />
-            <Route path="/loja/register" element={<LojaProductsRegister />} />
-            <Route path="/loja/edit/:id" element={<LojaProductsEdit />} />
+        {/* Missões */}
+        <Route path="/missions" element={<MissionsPage />} />
+        <Route path="/missions/register" element={<MissionRegister />} />
+        <Route path="/missions/edit/:id" element={<EditMission />} />
 
-            {/* Quizzes */}
-            <Route path="/quizzes" element={<QuizzesPage />} />
-            <Route path="/quizzes/register" element={<QuizRegister />} />
-            <Route path="/quizzes/edit/:id" element={<EditQuiz />} />
-
-            {/* Missões */}
-            <Route path="/missions" element={<MissionsPage />} />
-            <Route path="/missions/register" element={<MissionRegister />} />
-            <Route path="/missions/edit/:id" element={<EditMission />} />
-
-            {/* Rota padrão */}
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="*" element={<Navigate to="/home" replace />} />
-          </Routes>
-        </ProtectedRoute>
-      }
-    />
-  </Routes>
-);
-
-export default Routers;
+        {/* Redirecionamentos */}
+        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
+      </Route>
+    </Routes>
+  );
+}

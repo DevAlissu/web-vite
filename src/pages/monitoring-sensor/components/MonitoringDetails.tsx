@@ -18,10 +18,6 @@ const MonitoringDetails: React.FC<Props> = ({ monitoring }) => {
             <span className="info-label">Descrição:</span>
             <span className="info-value">{monitoring.description}</span>
           </div>
-          <div className="monitoring-cell">
-            <span className="info-label">Consumo Estimado:</span>
-            <span className="info-value">{monitoring.estimated_consumption} kWh</span>
-          </div>
         </div>
       </div>
     </section>

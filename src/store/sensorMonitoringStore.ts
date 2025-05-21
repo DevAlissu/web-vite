@@ -6,14 +6,14 @@ const mockData: MonitoringItem[] = [
   {
     id: 1,
     name: "Sensor A",
-    description: "Mock sensor A",
+    description: "sensor A",
     estimated_consumption: 0,
     created_at: new Date().toISOString(),
   },
   {
     id: 2,
     name: "Sensor B",
-    description: "Mock sensor B",
+    description: "sensor B",
     estimated_consumption: 0,
     created_at: new Date().toISOString(),
   },

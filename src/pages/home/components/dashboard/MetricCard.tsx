@@ -1,7 +1,8 @@
-import { Card } from "antd";
+// src/pages/home/components/dashboard/MetricCard.tsx
 import React from "react";
+import { Card } from "antd";
 
-interface MetricCardProps {
+export interface MetricCardProps {
   icon: React.ReactNode;
   title: string;
   value: number | string;

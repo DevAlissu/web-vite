@@ -1,20 +1,27 @@
+// src/store/missions.ts
 import { create } from "zustand";
 import { MissionItem } from "../types/missions";
 import {
   getMissions,
-  createMission,
-  updateMission,
-  deleteMission,
-  associateMissionToMonitoring,
+  createMission as svcCreateMission,
+  updateMission as svcUpdateMission,
+  deleteMission as svcDeleteMission,
+  associateMissionToMonitoring as svcAssociateMission,
 } from "../services/MissionService";
 
 interface MissionStore {
   missions: MissionItem[];
   fetchMissions: () => Promise<void>;
-  createMission: (missionData: Partial<MissionItem>) => Promise<void>;
-  updateMission: (id: number, missionData: Partial<MissionItem>) => Promise<void>;
+  createMission: (missionData: Omit<MissionItem, "id">) => Promise<void>;
+  updateMission: (
+    id: number,
+    missionData: Partial<Omit<MissionItem, "id">>
+  ) => Promise<void>;
   deleteMission: (id: number) => Promise<void>;
-  associateMissionToMonitoring: (missionId: number, monitoringId: number) => Promise<void>;
+  associateMissionToMonitoring: (
+    missionId: number,
+    monitoringId: number
+  ) => Promise<void>;
 }
 
 export const useMissionStore = create<MissionStore>((set) => ({
@@ -31,7 +38,10 @@ export const useMissionStore = create<MissionStore>((set) => ({
 
   createMission: async (missionData) => {
     try {
-      await createMission(missionData);
+      const newMission = await svcCreateMission(missionData);
+      set((state) => ({
+        missions: [...state.missions, newMission],
+      }));
     } catch (error) {
       console.error("Erro ao criar missão", error);
     }
@@ -39,7 +49,10 @@ export const useMissionStore = create<MissionStore>((set) => ({
 
   updateMission: async (id, missionData) => {
     try {
-      await updateMission(id, missionData);
+      const updated = await svcUpdateMission(id, missionData);
+      set((state) => ({
+        missions: state.missions.map((m) => (m.id === id ? updated : m)),
+      }));
     } catch (error) {
       console.error("Erro ao atualizar missão", error);
     }
@@ -47,9 +60,9 @@ export const useMissionStore = create<MissionStore>((set) => ({
 
   deleteMission: async (id) => {
     try {
-      await deleteMission(id);
+      await svcDeleteMission(id);
       set((state) => ({
-        missions: state.missions.filter((mission) => mission.id !== id),
+        missions: state.missions.filter((m) => m.id !== id),
       }));
     } catch (error) {
       console.error("Erro ao deletar missão", error);
@@ -58,7 +71,10 @@ export const useMissionStore = create<MissionStore>((set) => ({
 
   associateMissionToMonitoring: async (missionId, monitoringId) => {
     try {
-      await associateMissionToMonitoring(missionId, monitoringId);
+      const updated = await svcAssociateMission(missionId, monitoringId);
+      set((state) => ({
+        missions: state.missions.map((m) => (m.id === missionId ? updated : m)),
+      }));
     } catch (error) {
       console.error("Erro ao associar missão ao monitoramento", error);
     }

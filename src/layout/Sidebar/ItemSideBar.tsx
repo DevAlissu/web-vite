@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Button } from "antd";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import ItensMenu from "./components/ItensMenu";  
-import Logo from "./components/Logo";           
-import LogoInova from "./components/LogoInova";  
+import ItensMenu from "./components/ItensMenu";
+import Logo from "./components/Logo";
+import LogoInova from "./components/LogoInova";
 
 const { Sider } = Layout;
 
@@ -26,35 +26,24 @@ const ItemSideBar: React.FC = () => {
 
   return (
     <Sider
-      className="menu"
+      className="menu flex flex-column justify-content-between shadow-2 bg-white"
       trigger={null}
       collapsible
       collapsed={collapsed}
       width={220}
-      style={{
-        background: "#FFF",
-        minHeight: "100vh",
-        borderRight: "0px solid #e8e8e8",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-      }}
+      style={{ minHeight: "100vh" }} // não tem utilitário direto pra 100vh no antd, mas se quiser tirar, use height: "100vh" em CSS externo
     >
       <div>
         <Logo collapsed={collapsed} />
-        <Button
-          type="text"
-          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            fontSize: "24px",
-            color: "#000",
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            margin: "10px 0",
-          }}
-        />
+        <div className="flex justify-content-center my-3">
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-0"
+            style={{ fontSize: "24px", color: "#000" }}
+          />
+        </div>
         <ItensMenu />
       </div>
 

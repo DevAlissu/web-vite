@@ -1,153 +1,158 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Layout, Row, Col, Divider } from "antd";
+// src/pages/home/HomePage.tsx
+import React, { useEffect, useState } from "react";
+import { Layout, Row, Col, Spin } from "antd";
 import {
   DashboardOutlined,
   PartitionOutlined,
   HddOutlined,
   NodeExpandOutlined,
 } from "@ant-design/icons";
-
 import ItemHeader from "../../layout/Header/ItemHeader";
 import ItemSideBar from "../../layout/Sidebar/ItemSideBar";
-import { useMonitoringStore } from "../../store/monitoringStore";
-import { useMonitoringSections } from "./hooks/useMonitoringSections";
-import MonitoringChart from "./components/dashboard/MonitoringChart";
+import { useMonitoringStore } from "@/store/monitoringStore";
+
+import DashboardMetrics from "./components/dashboard/DashboardMetrics";
 import MonitoringSelector from "./components/dashboard/MonitoringSelector";
-import MetricCard from "./components/dashboard/MetricCard";
+import EnergyTrendCard from "./components/dashboard/EnergyTrendCard";
+import BarBySectionCard from "./components/dashboard/BarBySectionCard";
+import EnvironmentalBreakdownCard from "./components/dashboard/EnvironmentalBreakdownCard";
+import TotalConsumptionOverview from "./components/dashboard/TotalConsumptionOverview";
 
-import api from "@/services/api";
-
-import "../../styles/custom/custom.css";
+import { useDashboardMetrics } from "./hooks/useDashboardMetrics";
+import { useEnergyTrend } from "./hooks/useEnergyTrend";
+import { useSectionLoads } from "./hooks/useSectionLoads";
+import { useEnvironmentalData } from "./hooks/useEnvironmentalData";
+import { useTotalConsumption } from "./hooks/useTotalConsumption";
 
 const { Content } = Layout;
 
 const HomePage: React.FC = () => {
+  // selector for Monitoramentos dropdown
   const [selectedMonitoringId, setSelectedMonitoringId] = useState<
     number | null
   >(null);
-  const [countMonitoring, setCountMonitoring] = useState(0);
+  const { monitorings, fetchMonitorings } = useMonitoringStore();
 
-  const { fetchCountMonitorings } = useMonitoringStore();
-  const { monitoringSections } = useMonitoringSections(
-    selectedMonitoringId || undefined
+  // fetch monitorings once
+  useEffect(() => {
+    fetchMonitorings();
+  }, [fetchMonitorings]);
+
+  // top metrics hook
+  const {
+    activeMonitoringCount,
+    totalSectionsCount,
+    totalSectorsCount,
+    totalDevicesCount,
+  } = useDashboardMetrics();
+
+  // data hooks
+  const { data: trendData, loading: trendLoading } = useEnergyTrend(
+    selectedMonitoringId ?? undefined
+  );
+  const { data: barData, loading: barLoading } = useSectionLoads(
+    selectedMonitoringId ?? undefined
+  );
+  const { data: envData, loading: envLoading } = useEnvironmentalData(
+    selectedMonitoringId ?? undefined
+  );
+  const { data: totalData, loading: totalLoading } = useTotalConsumption(
+    selectedMonitoringId ?? undefined
   );
 
-  const iotSections = useMemo(
-    () => monitoringSections.filter((s) => s.DeviceIot),
-    [monitoringSections]
-  );
+  // assemble metrics items
+  const metricsItems = [
+    {
+      icon: <DashboardOutlined style={{ fontSize: 16, color: "#004281" }} />,
+      title: "Monitoramentos Ativos",
+      value: activeMonitoringCount,
+    },
+    {
+      icon: <PartitionOutlined style={{ fontSize: 16, color: "#004281" }} />,
+      title: "Seções Ativas",
+      value: totalSectionsCount,
+    },
+    {
+      icon: <HddOutlined style={{ fontSize: 16, color: "#004281" }} />,
+      title: "Setores Monitorados",
+      value: totalSectorsCount,
+    },
+    {
+      icon: <NodeExpandOutlined style={{ fontSize: 16, color: "#004281" }} />,
+      title: "Dispositivos Monitorados",
+      value: totalDevicesCount,
+    },
+  ];
 
-  const [energyMap, setEnergyMap] = useState<
-    Record<number, { name: string; value: number }[]>
-  >({});
-
-  useEffect(() => {
-    fetchCountMonitorings().then((res) => setCountMonitoring(res));
-  }, []);
-
-  useEffect(() => {
-    const fetchEnergy = async () => {
-      const map: Record<number, { name: string; value: number }[]> = {};
-
-      for (const section of iotSections) {
-        try {
-          const response = await api.get(
-            `/section-measurements/?section_id=${section.id}`
-          );
-          map[section.id] = response.data.map((d: any) => ({
-            name: `${d.interval}s`,
-            value: d.energia_ativa_kWh,
-          }));
-        } catch (error) {
-          console.error(`Erro ao buscar dados da seção ${section.id}:`, error);
-        }
-      }
-
-      setEnergyMap(map);
-    };
-
-    if (selectedMonitoringId) {
-      setInterval(() => {
-        fetchEnergy();
-      }, 10000);
-    }
-  }, [selectedMonitoringId, iotSections]);
+  const loadingAny = trendLoading || barLoading || envLoading || totalLoading;
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ height: "100vh", overflow: "hidden" }}>
       <ItemSideBar />
-      <Layout style={{ border: "none" }}>
+      <Layout>
         <ItemHeader />
-        <Content style={{ padding: "20px" }}>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} md={6}>
-              <MetricCard
-                icon={
-                  <DashboardOutlined
-                    style={{ color: "#004281", fontSize: 24 }}
-                  />
-                }
-                title="Monitoramentos Ativos"
-                value={countMonitoring}
-              />
+        <Content style={{ padding: 8, height: "100%" }}>
+          {/* métricas + selector */}
+          <Row gutter={8} wrap={false} align="middle">
+            <Col flex="auto">
+              <DashboardMetrics items={metricsItems} />
             </Col>
-            <Col xs={24} sm={12} md={6}>
-              <MetricCard
-                icon={
-                  <PartitionOutlined
-                    style={{ color: "#004281", fontSize: 24 }}
-                  />
-                }
-                title="Seções Ativas"
-                value={10}
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <MetricCard
-                icon={
-                  <HddOutlined style={{ color: "#004281", fontSize: 24 }} />
-                }
-                title="Setores Monitorados"
-                value={100}
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <MetricCard
-                icon={
-                  <NodeExpandOutlined
-                    style={{ color: "#004281", fontSize: 24 }}
-                  />
-                }
-                title="Equipamentos Monitorados"
-                value={100}
+            <Col flex="0 0 240px">
+              <MonitoringSelector
+                value={selectedMonitoringId}
+                onChange={setSelectedMonitoringId}
               />
             </Col>
           </Row>
 
-          <Divider
-            style={{
-              height: "3px",
-              backgroundColor: "#004281",
-              margin: "20px 0",
-              border: "none",
-            }}
-          />
+          {loadingAny ? (
+            <div style={{ textAlign: "center", marginTop: 50 }}>
+              <Spin size="large" />
+            </div>
+          ) : (
+            <>
+              {/* 2×2 mini-gráficos */}
+              <Row gutter={[8, 8]} style={{ marginTop: 12 }}>
+                <Col span={12}>
+                  <EnergyTrendCard
+                    title={`Tendência de Energia — ${
+                      selectedMonitoringId ?? "Geral"
+                    }`}
+                    data={trendData}
+                  />
+                </Col>
+                <Col span={12}>
+                  <EnergyTrendCard
+                    title="Tendência de Energia — Geral"
+                    data={trendData}
+                    stroke="#82ca9d"
+                  />
+                </Col>
+                <Col span={12}>
+                  <BarBySectionCard title="Carga por Seção" data={barData} />
+                </Col>
+                <Col span={12}>
+                  <EnvironmentalBreakdownCard
+                    title="Distribuição Ambiental"
+                    data={envData}
+                    colors={["#0088FE", "#00C49F", "#FFBB28"]}
+                  />
+                </Col>
+              </Row>
 
-          <Row gutter={[16, 16]}>
-            <MonitoringSelector
-              selectedId={selectedMonitoringId}
-              onChange={setSelectedMonitoringId}
-            />
-
-            {iotSections.map((section) => (
-              <Col span={9} key={section.id}>
-                <MonitoringChart
-                  title={section.name}
-                  data={energyMap[section.id] || []}
-                />
-              </Col>
-            ))}
-          </Row>
+              {/* visão geral full-width */}
+              <Row style={{ marginTop: 12 }}>
+                <Col span={24}>
+                  <TotalConsumptionOverview
+                    data={totalData.map((d) => ({
+                      name: `${d.time}m`,
+                      value: d.value,
+                    }))}
+                  />
+                </Col>
+              </Row>
+            </>
+          )}
         </Content>
       </Layout>
     </Layout>

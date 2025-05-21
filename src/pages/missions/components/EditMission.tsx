@@ -1,80 +1,102 @@
-import React, { useState, useEffect } from "react";
+// src/pages/home/components/mission/MissionEdit.tsx
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { message, Card, Input, Select, DatePicker, Button, Row, Col } from "antd";
+import {
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  DatePicker,
+  Switch,
+  Button,
+  Row,
+  Col,
+  Card,
+  message,
+} from "antd";
+import dayjs, { Dayjs } from "dayjs";
 import { useMissionStore } from "../../../store/missions";
 import { useMonitoringStore } from "../../../store/monitoringStore";
+import { useProductsStore } from "../../../store/products";
 import ItemSideBar from "../../../layout/Sidebar/ItemSideBar";
 import ItemHeader from "../../../layout/Header/ItemHeader";
 import ItemHeaderCabecalho from "../../../layout/Header/components/ItemHeaderCabecalho";
-import dayjs, { Dayjs } from "dayjs";
 
 const { Option } = Select;
 
 const MissionEdit: React.FC = () => {
+  const [form] = Form.useForm();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { missions, updateMission, fetchMissions } = useMissionStore();
+  const { missions, fetchMissions, updateMission } = useMissionStore();
   const { monitorings, fetchMonitorings } = useMonitoringStore();
+  const { products, fetchProducts } = useProductsStore();
   const [loading, setLoading] = useState(false);
-  const [formValues, setFormValues] = useState({
-    name: "",
-    description: "",
-    energy_meta: "0",
-    quantity_xp: "0",
-    status: "",
-    date_start: null as Dayjs | null,
-    date_end: null as Dayjs | null,
-    monitoring: undefined as number | undefined, // 🔹 Corrigindo para undefined
-  });
 
+  // carrega dados
   useEffect(() => {
-    const loadData = async () => {
-      await fetchMissions();
-      await fetchMonitorings();
-      const mission = missions.find((m) => m.id === Number(id));
-      if (mission) {
-        setFormValues({
-          name: mission.name,
-          description: mission.description,
-          energy_meta: mission.energy_meta?.toString() || "0",
-          quantity_xp: mission.quantity_xp?.toString() || "0",
-          status: mission.status,
-          date_start: mission.date_start ? dayjs(mission.date_start) : null,
-          date_end: mission.date_end ? dayjs(mission.date_end) : null,
-          monitoring: mission.monitoring || undefined, // 🔹 Evita que seja null e cause erro no Select
-        });
-      }
-    };
-    loadData();
-  }, [id, fetchMissions, fetchMonitorings, missions]);
+    fetchMissions();
+    fetchMonitorings();
+    fetchProducts();
+  }, []);
 
-  const handleChange = (name: string, value: any) => {
-    setFormValues((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async () => {
-    if (!formValues.name.trim() || !formValues.description.trim() || !formValues.status) {
-      message.error("Todos os campos obrigatórios devem ser preenchidos!");
-      return;
+  // preenche o formulário quando missions estiver disponível
+  useEffect(() => {
+    const mid = Number(id);
+    const mission = missions.find((m) => m.id === mid);
+    if (mission) {
+      form.setFieldsValue({
+        name: mission.name,
+        description: mission.description,
+        energy_meta: mission.energy_meta,
+        nansen_coins: mission.nansen_coins,
+        quantity_xp: mission.quantity_xp,
+        status: mission.status,
+        date_start: mission.date_start ? dayjs(mission.date_start) : null,
+        date_end: mission.date_end ? dayjs(mission.date_end) : null,
+        monitoring: mission.monitoring ?? undefined,
+        is_order_production: mission.is_order_production,
+        product: mission.product ?? undefined,
+        order_production: mission.order_production,
+        quantity_product: mission.quantity_product,
+      });
     }
+  }, [missions, form, id]);
 
+  const onFinish = async (values: any) => {
     setLoading(true);
     try {
       await updateMission(Number(id), {
-        ...formValues,
-        energy_meta: Number(formValues.energy_meta),
-        quantity_xp: Number(formValues.quantity_xp),
-        date_start: formValues.date_start ? formValues.date_start.format("YYYY-MM-DD") : null,
-        date_end: formValues.date_end ? formValues.date_end.format("YYYY-MM-DD") : null,
-        monitoring: formValues.monitoring ?? null, // 🔹 Certificando que será enviado `null` caso não tenha monitoramento
+        name: values.name,
+        description: values.description,
+        energy_meta: Number(values.energy_meta),
+        nansen_coins: Number(values.nansen_coins),
+        quantity_xp: Number(values.quantity_xp),
+        status: values.status,
+        date_start: values.date_start
+          ? (values.date_start as Dayjs).toISOString()
+          : null,
+        date_end: values.date_end
+          ? (values.date_end as Dayjs).toISOString()
+          : null,
+        is_order_production: values.is_order_production,
+        product: values.is_order_production ? values.product : null,
+        order_production: values.is_order_production
+          ? Number(values.order_production)
+          : 0,
+        quantity_product: values.is_order_production
+          ? Number(values.quantity_product)
+          : 0,
+        monitoring: values.monitoring ?? null,
       });
       message.success("Missão atualizada com sucesso!");
       navigate("/missions");
-    } catch (error) {
+    } catch (err) {
+      console.error(err);
       message.error("Erro ao atualizar missão.");
-      console.error(error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -83,108 +105,200 @@ const MissionEdit: React.FC = () => {
       <div className="content-container">
         <ItemHeader />
         <main className="content">
-          <ItemHeaderCabecalho title="Editar Missão" subTitle="Atualize os campos necessários para editar a missão" />
+          <ItemHeaderCabecalho
+            title="Editar Missão"
+            subTitle="Atualize os campos necessários"
+          />
 
           <Card>
-            <Row gutter={16}>
-              <Col span={12}>
-                <label>Nome</label>
-                <Input 
-                  placeholder="Digite o nome da missão" 
-                  value={formValues.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                />
-              </Col>
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              initialValues={{ status: "Pendente", is_order_production: false }}
+            >
+              {/* Nome e Descrição */}
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="name"
+                    label="Nome"
+                    rules={[{ required: true, message: "Informe o nome" }]}
+                  >
+                    <Input />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="description"
+                    label="Descrição"
+                    rules={[{ required: true, message: "Informe a descrição" }]}
+                  >
+                    <Input.TextArea />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-              <Col span={12}>
-                <label>Descrição</label>
-                <Input.TextArea 
-                  placeholder="Digite a descrição"
-                  value={formValues.description}
-                  onChange={(e) => handleChange("description", e.target.value)}
-                />
-              </Col>
-            </Row>
+              {/* Valores numéricos */}
+              <Row gutter={16}>
+                <Col span={8}>
+                  <Form.Item
+                    name="energy_meta"
+                    label="Meta de Energia"
+                    rules={[
+                      { required: true, message: "Informe a meta de energia" },
+                    ]}
+                  >
+                    <InputNumber style={{ width: "100%" }} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    name="nansen_coins"
+                    label="Nansen Coins"
+                    rules={[
+                      { required: true, message: "Informe os Nansen Coins" },
+                    ]}
+                  >
+                    <InputNumber style={{ width: "100%" }} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    name="quantity_xp"
+                    label="Quantidade XP"
+                    rules={[
+                      { required: true, message: "Informe a quantidade XP" },
+                    ]}
+                  >
+                    <InputNumber style={{ width: "100%" }} />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-            <Row gutter={16} style={{ marginTop: 16 }}>
-              <Col span={8}>
-                <label>Meta de Energia</label>
-                <Input 
-                  placeholder="Digite a meta de energia" 
-                  type="number"
-                  value={formValues.energy_meta}
-                  onChange={(e) => handleChange("energy_meta", e.target.value)}
-                />
-              </Col>
+              {/* Status e Datas */}
+              <Row gutter={16}>
+                <Col span={8}>
+                  <Form.Item
+                    name="status"
+                    label="Status"
+                    rules={[{ required: true, message: "Selecione o status" }]}
+                  >
+                    <Select>
+                      <Option value="Pendente">Pendente</Option>
+                      <Option value="Em Andamento">Em andamento</Option>
+                      <Option value="Finalizada">Finalizada</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name="date_start" label="Data de Início">
+                    <DatePicker style={{ width: "100%" }} showTime />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name="date_end" label="Data de Fim">
+                    <DatePicker style={{ width: "100%" }} showTime />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-              <Col span={8}>
-                <label>Quantidade XP</label>
-                <Input 
-                  placeholder="Digite a quantidade de XP" 
-                  type="number"
-                  value={formValues.quantity_xp}
-                  onChange={(e) => handleChange("quantity_xp", e.target.value)}
-                />
-              </Col>
+              {/* Monitoramento */}
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item name="monitoring" label="Monitoramento">
+                    <Select allowClear placeholder="Selecione">
+                      {monitorings.map((m) => (
+                        <Option key={m.id} value={m.id}>
+                          {m.name}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
 
-              <Col span={8}>
-                <label>Status</label>
-                <Select 
-                  placeholder="Selecione o status" 
-                  value={formValues.status}
-                  onChange={(value) => handleChange("status", value)}
-                  style={{ width: "100%" }}
+              {/* É Ordem de Produção? */}
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="is_order_production"
+                    label="É Ordem de Produção?"
+                    valuePropName="checked"
+                  >
+                    <Switch />
+                  </Form.Item>
+                </Col>
+              </Row>
+
+              {/* Campos extras OP */}
+              <Form.Item noStyle shouldUpdate>
+                {() =>
+                  form.getFieldValue("is_order_production") && (
+                    <Row gutter={16}>
+                      <Col span={8}>
+                        <Form.Item
+                          name="product"
+                          label="Produto"
+                          rules={[
+                            { required: true, message: "Selecione o produto" },
+                          ]}
+                        >
+                          <Select allowClear placeholder="Selecione">
+                            {products.map((p) => (
+                              <Option key={p.id} value={p.id}>
+                                {p.name}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col span={8}>
+                        <Form.Item
+                          name="order_production"
+                          label="Nº da Ordem"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Informe o nº da ordem",
+                            },
+                          ]}
+                        >
+                          <Input />
+                        </Form.Item>
+                      </Col>
+                      <Col span={8}>
+                        <Form.Item
+                          name="quantity_product"
+                          label="Quantidade"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Informe a quantidade",
+                            },
+                          ]}
+                        >
+                          <InputNumber style={{ width: "100%" }} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  )
+                }
+              </Form.Item>
+
+              {/* Ações */}
+              <Form.Item style={{ textAlign: "right", marginTop: 16 }}>
+                <Button
+                  style={{ marginRight: 8 }}
+                  onClick={() => navigate("/missions")}
                 >
-                  <Option value="pendente">Pendente</Option>
-                  <Option value="em andamento">Em andamento</Option>
-                  <Option value="finalizada">Finalizada</Option>
-                </Select>
-              </Col>
-            </Row>
-
-            <Row gutter={16} style={{ marginTop: 16 }}>
-              <Col span={12}>
-                <label>Data de Início</label>
-                <DatePicker 
-                  style={{ width: "100%" }} 
-                  value={formValues.date_start}
-                  onChange={(date) => handleChange("date_start", date)}
-                />
-              </Col>
-
-              <Col span={12}>
-                <label>Data de Fim</label>
-                <DatePicker 
-                  style={{ width: "100%" }} 
-                  value={formValues.date_end}
-                  onChange={(date) => handleChange("date_end", date)}
-                />
-              </Col>
-            </Row>
-
-            <Row gutter={16} style={{ marginTop: 16 }}>
-              <Col span={12}>
-                <label>Associar Monitoramento</label>
-                <Select
-                  placeholder="Selecione um monitoramento"
-                  value={formValues.monitoring}
-                  onChange={(value) => handleChange("monitoring", value)}
-                  style={{ width: "100%" }}
-                >
-                  <Option value={undefined}>Nenhum</Option> {/* 🔹 Agora pode ser removido também */}
-                  {monitorings.map((monitoring) => (
-                    <Option key={monitoring.id} value={monitoring.id}>
-                      {monitoring.name}
-                    </Option>
-                  ))}
-                </Select>
-              </Col>
-            </Row>
-
-            <div style={{ marginTop: 16, textAlign: "right" }}>
-              <Button onClick={() => navigate("/missions")} style={{ marginRight: 8 }}>Cancelar</Button>
-              <Button type="primary" onClick={handleSubmit} loading={loading}>Salvar Alterações</Button>
-            </div>
+                  Cancelar
+                </Button>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                  Salvar
+                </Button>
+              </Form.Item>
+            </Form>
           </Card>
         </main>
       </div>

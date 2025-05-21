@@ -1,6 +1,6 @@
+// src/services/api.ts
 import axios from "axios";
 
-//export const BASE_URL = `http://localhost:10000/api/`;
 export const BASE_URL = `http://200.129.168.197:20163/api`;
 
 const api = axios.create({
@@ -11,52 +11,54 @@ const api = axios.create({
 // Adicionar token automaticamente se existir
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("userToken"); // Use a chave correta onde o token é armazenado
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    const token = localStorage.getItem("userToken");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Interceptor para lidar com erro 401 (não autorizado), e tentar renovar o token
+// Interceptor de resposta
 api.interceptors.response.use(
-  (response) => response, // Se a resposta for bem-sucedida, apenas retorna
+  (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      // Se o erro for 401 (não autorizado)
-      const refreshToken = localStorage.getItem("refreshToken"); // Pega o refresh_token
+    const status = error.response?.status;
+    const url = error.config?.url || "";
+    const method = error.config?.method || "";
+
+    // 1) Se for 401 **na rota de login**, só rejeita para
+    // que o catch local exiba a notificação
+    if (
+      status === 401 &&
+      method.toLowerCase() === "post" &&
+      url.endsWith("/login/")
+    ) {
+      return Promise.reject(error);
+    }
+
+    // 2) Senão, continua seu fluxo de refresh / logout habitual
+    if (status === 401) {
+      const refreshToken = localStorage.getItem("refreshToken");
       if (refreshToken) {
         try {
-          // Tente renovar o token
-          const response = await axios.post(`${BASE_URL}/auth/refresh/`, {
+          const r = await axios.post(`${BASE_URL}/auth/refresh/`, {
             refresh: refreshToken,
           });
-          const newAccessToken = response.data.access;
-
-          // Atualize o localStorage com o novo token
-          localStorage.setItem("userToken", newAccessToken);
-
-          // Atualize a requisição original com o novo token
-          error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
-
-          // Repita a requisição original
+          const newAccess = r.data.access;
+          localStorage.setItem("userToken", newAccess);
+          error.config.headers["Authorization"] = `Bearer ${newAccess}`;
           return axios(error.config);
-        } catch (refreshError) {
-          console.error("Erro ao renovar o token:", refreshError);
+        } catch {
           localStorage.removeItem("userToken");
           localStorage.removeItem("refreshToken");
-          window.location.href = "/login"; // Redireciona para login se não conseguir renovar
+          window.location.href = "/login";
         }
       } else {
         localStorage.removeItem("userToken");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "/login"; // Redireciona para login se não houver refresh token
+        window.location.href = "/login";
       }
     }
+
     return Promise.reject(error);
   }
 );

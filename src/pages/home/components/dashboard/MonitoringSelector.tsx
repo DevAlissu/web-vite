@@ -1,16 +1,18 @@
+// src/pages/home/components/dashboard/MonitoringSelector.tsx
 import React, { useEffect } from "react";
-import { Card, Col, Radio, RadioChangeEvent, Select, DatePicker } from "antd";
+import { Card, Select } from "antd";
 import { useMonitoringStore } from "@/store/monitoringStore";
+import { MonitoringItem } from "@/types/monitoringTypes";
 
 const { Option } = Select;
 
-interface MonitoringSelectorProps {
-  selectedId?: number | null;
-  onChange: (id: number | null) => void;
+export interface MonitoringSelectorProps {
+  value?: number | null;
+  onChange: (value: number | null) => void;
 }
 
 const MonitoringSelector: React.FC<MonitoringSelectorProps> = ({
-  selectedId,
+  value,
   onChange,
 }) => {
   const { monitorings, fetchMonitorings } = useMonitoringStore();
@@ -19,43 +21,26 @@ const MonitoringSelector: React.FC<MonitoringSelectorProps> = ({
     fetchMonitorings();
   }, []);
 
-  const handleChange = (e: RadioChangeEvent) => {
-    const selectedValue = e.target.value;
-    onChange(selectedValue ?? null);
-  };
-
   return (
-    <Col span={6} xs={24} sm={12} md={6} lg={6} xl={6}>
-      <Card title="Selecione o monitoramento:">
-        <Radio.Group
-          onChange={handleChange}
-          value={selectedId ?? null}
-          style={{ display: "flex", flexDirection: "column", gap: 8 }}
-        >
-          {monitorings.map((m) => (
-            <Radio key={m.id} value={m.id}>
-              {m.name}
-            </Radio>
-          ))}
-        </Radio.Group>
-      </Card>
-
-      <Card title="Filtrar:">
-        <DatePicker.RangePicker style={{ width: "100%" }} />
-      </Card>
-
-      <Card title="OP 15400">
-        <p>Selecione a bandeira tarifária:</p>
-        <Select defaultValue="Amarela" style={{ width: "100%" }}>
-          <Option value="Amarela">Amarela</Option>
-          <Option value="Verde">Verde</Option>
-          <Option value="Vermelha">Vermelha</Option>
-        </Select>
-        <p>Produto: Lumen 3</p>
-        <p>Quantidade: 100</p>
-        <p>Valor estimado: R$ 0,50</p>
-      </Card>
-    </Col>
+    <Card
+      size="small"
+      title="Selecionar Monitoramento"
+      bodyStyle={{ padding: 4 }}
+    >
+      <Select
+        value={value ?? undefined}
+        onChange={(v: number) => onChange(v)}
+        placeholder="Selecione o monitoramento"
+        style={{ width: "100%" }}
+        size="small"
+      >
+        {monitorings.map((m: MonitoringItem) => (
+          <Option key={m.id} value={m.id}>
+            {m.name}
+          </Option>
+        ))}
+      </Select>
+    </Card>
   );
 };
 

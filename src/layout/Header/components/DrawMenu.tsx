@@ -45,12 +45,21 @@ const DrawMenu: React.FC = () => {
             item.logout ? (
               <span
                 key={item.key}
-                style={{ color: "red", fontWeight: "bold", padding: "10px 0", cursor: "pointer" }}
+                style={{
+                  color: "red",
+                  fontWeight: "bold",
+                  padding: "10px 0",
+                  cursor: "pointer",
+                }}
               >
                 {item.label}
               </span>
             ) : (
-              <Link key={item.key} to={item.key} style={{ padding: "10px 0", fontSize: "16px" }}>
+              <Link
+                key={item.key}
+                to={item.key}
+                style={{ padding: "10px 0", fontSize: "16px" }}
+              >
                 {item.label}
               </Link>
             )

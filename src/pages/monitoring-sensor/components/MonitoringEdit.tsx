@@ -77,7 +77,7 @@ const MonitoringEdit: React.FC = () => {
         <ItemHeader />
         <main className="content">
           <ItemHeaderCabecalho
-            title="Editar Sensor (mock)"
+            title="Editar Sensor"
             subTitle="Formulário para edição de sensor no NansenSensor"
           />
           <DynamicForm

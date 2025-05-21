@@ -1,58 +1,28 @@
-import React, { useState } from "react";
-import { message } from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input, Select, Button, Card, message } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useUsersStore } from "../../../store/users";
 import ItemSideBar from "../../../layout/Sidebar/ItemSideBar";
 import ItemHeader from "../../../layout/Header/ItemHeader";
 import ItemHeaderCabecalho from "../../../layout/Header/components/ItemHeaderCabecalho";
-import DynamicForm from "../../../components/form/DynamicForm";
-import { useUsersStore } from "../../../store/users";
 import { UserRegister } from "../../../types/users";
 
+const { Option } = Select;
+
 const UsersRegister: React.FC = () => {
+  const [form] = Form.useForm<UserRegister>();
   const navigate = useNavigate();
   const { addUser } = useUsersStore();
   const [loading, setLoading] = useState(false);
-  const [formValues, setFormValues] = useState<UserRegister>({
-    username: "",
-    name: "",
-    email: "",
-    password: "",
-    role: "ADMIN",
-  });
 
-  const handleChange = (name: string, value: any) => {
-    setFormValues((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async () => {
-    if (!formValues.username.trim()) {
-      message.error("O username é obrigatório!");
-      return;
-    }
-
-    if (!formValues.name.trim()) {
-      message.error("O nome é obrigatório!");
-      return;
-    }
-
-    if (!formValues.email.trim()) {
-      message.error("O email é obrigatório!");
-      return;
-    }
-
-    if (!formValues.password.trim()) {
-      message.error("A senha é obrigatória!");
-      return;
-    }
-
+  const onFinish = async (vals: UserRegister) => {
     setLoading(true);
     try {
-      await addUser(formValues);
-      message.success("Usuário cadastrado com sucesso!");
+      await addUser(vals);
+      message.success("Usuário cadastrado!");
       navigate("/users");
-    } catch (error) {
-      message.error("Erro ao cadastrar usuário!");
-      console.error(error);
+    } catch {
+      message.error("Erro ao cadastrar!");
     } finally {
       setLoading(false);
     }
@@ -66,31 +36,70 @@ const UsersRegister: React.FC = () => {
         <main className="content">
           <ItemHeaderCabecalho
             title="Cadastro de Usuário"
-            subTitle="Preencha os campos abaixo para cadastrar um usuário"
+            subTitle="Preencha os dados"
           />
-          <DynamicForm
-            fields={[
-              { name: "username", label: "Username", type: "input", required: true },
-              { name: "name", label: "Nome", type: "input", required: true },
-              { name: "email", label: "Email", type: "input", required: true },
-              { name: "password", label: "Senha", type: "password", required: true },
-              {
-                name: "role",
-                label: "Permissão",
-                type: "select",
-                required: true,
-                options: [
-                  { value: "ADMIN", label: "Admin" },
-                  { value: "GAME", label: "Game" },
-                ],
-              },
-            ]}
-            values={formValues}
-            onChange={handleChange}
-            onSubmit={handleSubmit}
-            loading={loading}
-            onCancel={() => navigate("/users")}
-          />
+          <Card>
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              initialValues={{ role: "ADMIN" }}
+            >
+              <Form.Item
+                name="username"
+                label="Username"
+                rules={[{ required: true, message: "Informe o username" }]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="name"
+                label="Nome"
+                rules={[{ required: true, message: "Informe o nome" }]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  { required: true, message: "Informe o email" },
+                  { type: "email", message: "Email inválido" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="password"
+                label="Senha"
+                rules={[{ required: true, message: "Informe a senha" }]}
+              >
+                <Input.Password />
+              </Form.Item>
+              <Form.Item
+                name="role"
+                label="Permissão"
+                rules={[{ required: true, message: "Selecione a permissão" }]}
+              >
+                <Select>
+                  <Option value="ADMIN">Admin</Option>
+                  <Option value="LIDER">Líder</Option>
+                  <Option value="GAME">Game</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item style={{ textAlign: "right" }}>
+                <Button
+                  onClick={() => navigate("/users")}
+                  style={{ marginRight: 8 }}
+                >
+                  Cancelar
+                </Button>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                  Cadastrar
+                </Button>
+              </Form.Item>
+            </Form>
+          </Card>
         </main>
       </div>
     </div>

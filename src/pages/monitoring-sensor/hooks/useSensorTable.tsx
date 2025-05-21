@@ -41,24 +41,22 @@ export const useSensorTable = () => {
       key: "description",
     },
     {
-      title: "Consumo Estimado (kWh)",
-      dataIndex: "estimated_consumption",
-      key: "estimated_consumption",
-    },
-    {
       title: "Ações",
       key: "actions",
+      align: "center",
       render: (_: any, record: MonitoringItem) => (
-        <Actions
-          onEdit={() => navigate(`/sensor-monitoring/edit/${record.id}`)}
-          onConfigure={() =>
-            navigate(`/sensor-monitoring/configure/${record.id}`)
-          }
-          onDelete={async () => {
-            await deleteSensorMonitoring(record.id);
-            message.success("Sensor excluído.");
-          }}
-        />
+        <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
+          <Actions
+            onEdit={() => navigate(`/sensor-monitoring/edit/${record.id}`)}
+            onConfigure={() =>
+              navigate(`/sensor-monitoring/configure/${record.id}`)
+            }
+            onDelete={async () => {
+              await deleteSensorMonitoring(record.id);
+              message.success("Sensor excluído.");
+            }}
+          />
+        </div>
       ),
     },
   ];

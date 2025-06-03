@@ -73,12 +73,12 @@ const ItensMenu: React.FC = () => {
       children: [
         {
           key: "/monitoring",
-          label: "Energia (NansenIC)",
+          label: "NANSENic",
           onClick: () => navigate("/monitoring"),
         },
         {
           key: "/sensor-monitoring",
-          label: "Sensor (NansenSensor)",
+          label: "NANSENsor",
           onClick: () => navigate("/sensor-monitoring"),
         },
       ],

@@ -1,17 +1,19 @@
 // Definindo tipos permitidos para o campo 'type' do FormField
-export type FormFieldType = 
-  "text" | 
-  "input" | 
-  "select" | 
-  "number" | 
-  "upload" | 
-  "textarea" | 
-  "file" | 
-  "password" | 
-  "transfer" | 
-  "checkbox" | 
-  "switch" | 
-  "readonly"; // novo tipo para campos somente leitura
+// Definindo tipos permitidos para o campo 'type' do FormField
+export type FormFieldType =
+  | "text"
+  | "input"
+  | "select"
+  | "number"
+  | "upload"
+  | "textarea"
+  | "file"
+  | "password"
+  | "transfer"
+  | "checkbox"
+  | "switch"
+  | "readonly"
+  | "multiselect"; // <-- CORRETO, sem ; no meio!
 
 // A interface que descreve o campo do formulário
 export interface FormField {

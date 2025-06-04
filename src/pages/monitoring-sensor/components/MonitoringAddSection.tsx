@@ -1,4 +1,3 @@
-// src/pages/monitoring-sensor/components/MonitoringAddSection.tsx
 import React, { useState } from "react";
 import { Modal, message } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
@@ -11,9 +10,10 @@ const MonitoringAddSection: React.FC = () => {
   const monitoringId = Number(id);
   const navigate = useNavigate();
 
-  // Pegamos createSectionForMonitoring do store “sensor-monitoring”
+  // Store do sensor
   const { createSectionForMonitoring } = useMonitoringSensorStore();
 
+  // Formulário de seção sensor (agora com múltiplos devices)
   const {
     formValues,
     handleChange,
@@ -29,8 +29,6 @@ const MonitoringAddSection: React.FC = () => {
       message.error("O nome da seção é obrigatório!");
       return;
     }
-
-    // Traduzimos o “type_section” string ("SETOR", "LINHA" ou "EQUIPAMENTO") para o ID numérico
     const typeId = typeSections.find(
       (t) => t.name === formValues.type_section
     )?.id;
@@ -38,12 +36,9 @@ const MonitoringAddSection: React.FC = () => {
       message.error("ID do tipo de seção não encontrado!");
       return;
     }
-
     setLoading(true);
     try {
-      // ⬇️ Observação: aqui fazemos cast para “any” pois createSectionForMonitoring espera Partial<SectionSimple>,
-      // mas enviamos campos extras (type_section, setor, productionLine, equipament, DeviceIot).
-      // Dessa forma o TS não reclama, e o backend recebe tudo corretamente.
+      // Envia o array device_iots_ids para o backend
       await createSectionForMonitoring(monitoringId, {
         description: formValues.name,
         is_monitored: formValues.is_monitored,
@@ -61,11 +56,10 @@ const MonitoringAddSection: React.FC = () => {
           formValues.type_section === "EQUIPAMENTO"
             ? formValues.section_consume
             : undefined,
-        DeviceIot: formValues.is_monitored ? formValues.deviceIot : undefined,
+        device_iots_ids: formValues.is_monitored ? formValues.deviceIots : [], // <--- AGORA É ARRAY
       } as any);
 
       message.success("Seção adicionada com sucesso!");
-      // Volta para a tela de “configure” assim que adiciona
       navigate(`/sensor-monitoring/configure/${monitoringId}`);
     } catch (error) {
       console.error("Erro ao adicionar seção:", error);

@@ -26,7 +26,9 @@ const MonitoringAddSection: React.FC = () => {
       return;
     }
 
-    const typeId = typeSections.find((t) => t.name === formValues.type_section)?.id;
+    const typeId = typeSections.find(
+      (t) => t.name === formValues.type_section
+    )?.id;
 
     if (!typeId) {
       message.error("ID do tipo de seção não encontrado!");
@@ -42,10 +44,22 @@ const MonitoringAddSection: React.FC = () => {
         is_monitored: formValues.is_monitored,
         monitoring: Number(id),
         type_section: typeId,
-        DeviceIot: formValues.is_monitored ? formValues.deviceIot : null,
-        setor: formValues.type_section === "SETOR" ? formValues.section_consume : null,
-        productionLine: formValues.type_section === "LINHA" ? formValues.section_consume : null,
-        equipament: formValues.type_section === "EQUIPAMENTO" ? formValues.section_consume : null,
+        device_iots_ids:
+          formValues.is_monitored && formValues.deviceIot
+            ? [formValues.deviceIot]
+            : [],
+        setor:
+          formValues.type_section === "SETOR"
+            ? formValues.section_consume
+            : null,
+        productionLine:
+          formValues.type_section === "LINHA"
+            ? formValues.section_consume
+            : null,
+        equipament:
+          formValues.type_section === "EQUIPAMENTO"
+            ? formValues.section_consume
+            : null,
       });
 
       message.success("Seção adicionada com sucesso!");

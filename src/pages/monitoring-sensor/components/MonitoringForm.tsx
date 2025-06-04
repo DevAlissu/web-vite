@@ -41,6 +41,7 @@ const MonitoringForm: React.FC = () => {
         name: formValues.name,
         description: formValues.description,
         estimated_consumption: Number(formValues.estimated_consumption) || 0,
+        type_mmonitoring: "Nansenson",
       });
       message.success("Sensor cadastrado com sucesso!");
       navigate("/sensor-monitoring");

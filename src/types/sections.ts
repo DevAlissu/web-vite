@@ -5,6 +5,7 @@ export interface SectionItem {
   description: string | null;
   is_monitored: boolean;
   monitoring: number | null;
+  device_iots_ids?: number[];
 
   // Associações
   setor: number | null;

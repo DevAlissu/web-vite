@@ -36,7 +36,11 @@ export const useMonitoringStore = create<MonitoringState>((set) => ({
     set({ loading: true });
     try {
       const response = await api.get<MonitoringItem[]>("/monitorings/");
-      set({ monitorings: response.data });
+      set({
+        monitorings: response.data.filter(
+          (m) => m.type_mmonitoring === "Nansenic"
+        ),
+      });
     } catch (error) {
       console.error("Erro ao buscar monitoramentos:", error);
     } finally {

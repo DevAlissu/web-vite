@@ -40,6 +40,9 @@ export const useSectionForm = (isEdit = false) => {
 
   const filteredTypeSections = types.filter((t) => [1, 2, 3].includes(t.id)); // Apenas os fixos
 
+  // AJUSTE: filtrar só Nansenic
+  const filteredDevices = devices.filter((d) => d.type_device === "Nansenic");
+
   const getSelectedLabelFromId = (
     type: SectionFormValues["type_section"],
     id: number | null
@@ -69,7 +72,7 @@ export const useSectionForm = (isEdit = false) => {
           deviceIot: value ? prev.deviceIot : null,
         };
       }
-  
+
       if (name === "type_section") {
         return {
           ...prev,
@@ -79,12 +82,15 @@ export const useSectionForm = (isEdit = false) => {
           deviceIot: null,
         };
       }
-  
+
       if (name === "section_consume") {
-        const label = getSelectedLabelFromId(formValues.type_section, value as number);
-  
+        const label = getSelectedLabelFromId(
+          formValues.type_section,
+          value as number
+        );
+
         if (isEdit) fetchSections();
-  
+
         return {
           ...prev,
           section_consume: value as number,
@@ -92,14 +98,13 @@ export const useSectionForm = (isEdit = false) => {
           deviceIot: null,
         };
       }
-  
+
       return {
         ...prev,
         [name]: value,
       };
     });
   };
-  
 
   const getAvailableSections = () => {
     switch (formValues.type_section) {
@@ -119,7 +124,7 @@ export const useSectionForm = (isEdit = false) => {
     setFormValues,
     handleChange,
     getAvailableSections,
-    devices,
+    devices: filteredDevices, // <-- AJUSTE AQUI
     typeSections: filteredTypeSections,
   };
 };

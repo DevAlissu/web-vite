@@ -1,6 +1,8 @@
+// src/pages/monitoring-sensor/components/SectionForm.tsx
+
 import React from "react";
 import DynamicForm from "@/components/form/DynamicForm";
-import { SectionFormValues } from "@/pages/monitoring/hooks/useSectionForm";
+import { SectionFormValues } from "../hooks/useSectionForm";
 import { TypeSection } from "@/store/typeSectionStore";
 
 interface SectionFormProps {
@@ -11,7 +13,7 @@ interface SectionFormProps {
   loading: boolean;
   availableSections: { value: number; label: string }[];
   devices: { id: number; name: string }[];
-  typeSections: TypeSection[]; // ✅ tipos reais
+  typeSections: TypeSection[];
   isEdit?: boolean;
 }
 
@@ -29,7 +31,6 @@ const SectionForm: React.FC<SectionFormProps> = ({
   return (
     <DynamicForm
       fields={[
-       
         {
           name: "is_monitored",
           label: "Monitorado?",
@@ -40,7 +41,7 @@ const SectionForm: React.FC<SectionFormProps> = ({
           label: "Tipo da Seção",
           type: "select",
           options: typeSections.map((t) => ({
-            value: t.name, // "SETOR", "LINHA", "EQUIPAMENTO"
+            value: t.name,
             label:
               t.name === "SETOR"
                 ? "Setor"
@@ -58,9 +59,9 @@ const SectionForm: React.FC<SectionFormProps> = ({
           disabled: !values.type_section,
         },
         {
-          name: "deviceIot",
-          label: "Dispositivo IoT",
-          type: "select",
+          name: "deviceIots",
+          label: "Dispositivos IoT",
+          type: "multiselect", // <-- MULTISELECT
           options: devices.map((device) => ({
             value: device.id,
             label: device.name,
@@ -69,7 +70,9 @@ const SectionForm: React.FC<SectionFormProps> = ({
         },
       ]}
       values={values}
-      onChange={(name, value) => onChange(name as keyof SectionFormValues, value)}
+      onChange={(name, value) =>
+        onChange(name as keyof SectionFormValues, value)
+      }
       loading={loading}
       onCancel={onCancel}
       onSubmit={onSubmit}

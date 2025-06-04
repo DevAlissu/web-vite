@@ -1,19 +1,10 @@
-// src/pages/monitoring-sensor/hooks/useSensorTable.ts
-
-import { useEffect } from "react";
-import { Button, Tooltip } from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMonitoringSensorStore } from "@/store/monitoringSensorStore";
-import type { MonitoringItem } from "@/types/monitoringTypes";
+import { message } from "antd";
+import { MonitoringItem } from "@/types/monitoringTypes";
+import Actions from "@/components/actions/Actions"; // <-- Aqui igual ao Nansenic
 
-/**
- * useSensorTable retorna as colunas (com “Configurar”) e a lista de monitoramentos do tipo NANSENsor.
- */
 export function useSensorTable() {
   const navigate = useNavigate();
   const {
@@ -23,22 +14,25 @@ export function useSensorTable() {
     loadingMonitorings,
   } = useMonitoringSensorStore();
 
-  // Ao montar, busca todos os monitoramentos tipo NANSENsor
   useEffect(() => {
-    fetchAllMonitorings();
-  }, [fetchAllMonitorings]);
+    const fetchData = async () => {
+      try {
+        await fetchAllMonitorings();
+      } catch (error) {
+        message.error("Erro ao carregar monitoramentos NANSENsor.");
+      }
+    };
+    fetchData();
+  }, []);
 
-  // Handler para “Configurar Seções” → leva à página de seções deste monitoramento
-  const handleConfigure = (monitoringId: number) => {
-    navigate(`/sensor-monitoring/configure/${monitoringId}`);
-  };
-
-  // Colunas para a tabela de NANSENsor (sem o botão de “Visualizar”)
   const columns = [
     {
       title: "Nome",
       dataIndex: "name",
       key: "name",
+      // Se quiser sorting, copie o sorter igual do Nansenic
+      sorter: (a: MonitoringItem, b: MonitoringItem) =>
+        a.name.localeCompare(b.name),
     },
     {
       title: "Descrição",
@@ -46,48 +40,27 @@ export function useSensorTable() {
       key: "description",
     },
     {
-      title: "Consumo Estimado",
+      title: "Consumo Estimado (kWh)",
       dataIndex: "estimated_consumption",
       key: "estimated_consumption",
-      render: (value: number) => `${value} kWh`,
+      // Não precisa render custom se quiser igual ao Nansenic!
     },
     {
       title: "Ações",
       key: "actions",
       render: (_: any, record: MonitoringItem) => (
-        <div className="actions">
-          {/* Editar */}
-          <Tooltip title="Editar">
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => navigate(`/sensor-monitoring/edit/${record.id}`)}
-            >
-              Editar
-            </Button>
-          </Tooltip>
-
-          {/* Excluir */}
-          <Tooltip title="Excluir">
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => deleteMonitoring(record.id)}
-            >
-              Excluir
-            </Button>
-          </Tooltip>
-
-          {/* Configurar Seções */}
-          <Tooltip title="Configurar Seções">
-            <Button
-              type="text"
-              icon={<SettingOutlined />}
-              onClick={() => handleConfigure(record.id)}
-              style={{ marginLeft: 8 }}
-            />
-          </Tooltip>
-        </div>
+        <Actions
+          onEdit={() => navigate(`/sensor-monitoring/edit/${record.id}`)}
+          onConfigure={() =>
+            navigate(`/sensor-monitoring/configure/${record.id}`)
+          }
+          onDelete={async () => {
+            if (record.id) {
+              await deleteMonitoring(record.id);
+              message.success("Monitoramento excluído.");
+            }
+          }}
+        />
       ),
     },
   ];

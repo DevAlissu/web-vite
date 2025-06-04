@@ -28,9 +28,12 @@ interface MonitoringSensorState {
 
   fetchAllMonitorings: () => Promise<void>;
   fetchSectionsForMonitoring: (monitoringId: number) => Promise<void>;
-  createMonitoring: (
-    data: Omit<MonitoringItem, "id" | "created_at" | "type_mmonitoring">
-  ) => Promise<void>;
+  createMonitoring: (data: {
+    name: string;
+    description: string;
+    estimated_consumption: number;
+    type_mmonitoring: string;
+  }) => Promise<void>;
   updateMonitoring: (
     id: number,
     data: Partial<
@@ -58,12 +61,16 @@ export const useMonitoringSensorStore = create<MonitoringSensorState>(
     loadingMonitorings: false,
     loadingSections: false,
 
-    // 1) Busca todos monitoramentos “Nansenson”
+    // 1) Busca todos monitoramentos “Nansenson” (AJUSTADO: filtro por tipo!)
     fetchAllMonitorings: async () => {
       set({ loadingMonitorings: true });
       try {
         const list = await fetchMonitoringsSensor();
-        set({ monitorings: list });
+        set({
+          monitorings: list.filter(
+            (m: any) => m.type_mmonitoring === "Nansenson"
+          ),
+        });
       } catch (err) {
         console.error("Erro ao buscar monitoramentos Nansenson:", err);
       } finally {
@@ -136,7 +143,7 @@ export const useMonitoringSensorStore = create<MonitoringSensorState>(
       }
     },
 
-    // 6) Cria seção para o monitoringId (cast “as any” será feito no componente)
+    // 6) Cria seção para o monitoringId
     createSectionForMonitoring: async (monitoringId, data) => {
       set({ loadingSections: true });
       try {
@@ -166,7 +173,6 @@ export const useMonitoringSensorStore = create<MonitoringSensorState>(
       set({ loadingSections: true });
       try {
         await updateSectionForSensor(id, data);
-        // quem chamar decide recarregar manualmente
       } catch (err) {
         console.error("Erro ao atualizar seção Nansenson:", err);
       } finally {

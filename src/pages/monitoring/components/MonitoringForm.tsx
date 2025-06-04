@@ -40,6 +40,7 @@ const MonitoringForm: React.FC = () => {
         name: formValues.name,
         description: formValues.description,
         estimated_consumption: Number(formValues.estimated_consumption) || 0,
+        type_mmonitoring: "Nansenic",
       });
 
       message.success("Cadastro de monitoramento realizado com sucesso!");
@@ -58,16 +59,30 @@ const MonitoringForm: React.FC = () => {
       <div className="content-container">
         <ItemHeader />
         <main className="content">
-          <ItemHeaderCabecalho 
-            title="Cadastro Monitoramento de Energia" 
-            subTitle="Formulário para cadastro de Monitoramento de Energia" 
+          <ItemHeaderCabecalho
+            title="Cadastro Monitoramento de Energia"
+            subTitle="Formulário para cadastro de Monitoramento de Energia"
           />
 
           <DynamicForm
             fields={[
-              { name: "name", label: "Nome do Monitoramento", type: "input", required: true },
-              { name: "description", label: "Descrição", type: "textarea", required: true },
-              { name: "estimated_consumption", label: "Consumo Estimado (Kw/H)", type: "number" },
+              {
+                name: "name",
+                label: "Nome do Monitoramento",
+                type: "input",
+                required: true,
+              },
+              {
+                name: "description",
+                label: "Descrição",
+                type: "textarea",
+                required: true,
+              },
+              {
+                name: "estimated_consumption",
+                label: "Consumo Estimado (Kw/H)",
+                type: "number",
+              },
             ]}
             values={formValues}
             onChange={handleChange}

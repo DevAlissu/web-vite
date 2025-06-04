@@ -21,6 +21,7 @@ export const useSensor = () => {
     name: string;
     description: string;
     estimated_consumption: number;
+    type_mmonitoring: string;
   }) => {
     await createMonitoring(data);
     await fetchAllMonitorings();

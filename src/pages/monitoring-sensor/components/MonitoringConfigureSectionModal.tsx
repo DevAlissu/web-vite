@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Switch, Select, message } from "antd";
 import { useIoTDevices } from "@/hooks/useIoTDevices";
 import { SectionItem } from "@/types/sections";
-import { useSectionStore } from "@/store/sectionStore";
+import { useMonitoringSensorStore } from "@/store/monitoringSensorStore"; // USE A STORE DO SENSOR
 
 interface Props {
   section: SectionItem;
@@ -10,20 +10,28 @@ interface Props {
   onClose: () => void;
 }
 
-const MonitoringConfigureSectionModal: React.FC<Props> = ({ section, open, onClose }) => {
+const MonitoringConfigureSectionModal: React.FC<Props> = ({
+  section,
+  open,
+  onClose,
+}) => {
   const { devices, fetchDevices } = useIoTDevices();
-  const { updateSection } = useSectionStore();
+  const { updateSectionForMonitoring } = useMonitoringSensorStore(); // <-- CORRETO
 
   const [form, setForm] = useState({
     is_monitored: section.is_monitored,
-    deviceIot: section.DeviceIot ?? null,
+    deviceIots: section.device_iots?.map((d: any) => d.id) || [],
   });
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchDevices();
-  }, []);
+    setForm({
+      is_monitored: section.is_monitored,
+      deviceIots: section.device_iots?.map((d: any) => d.id) || [],
+    });
+  }, [section, fetchDevices]);
 
   const handleChange = (name: string, value: any) => {
     setForm((prev) => ({
@@ -35,19 +43,10 @@ const MonitoringConfigureSectionModal: React.FC<Props> = ({ section, open, onClo
   const handleSave = async () => {
     try {
       setLoading(true);
-      await updateSection(section.id, {
-        name: section.name,
-        description: section.description,
+      await updateSectionForMonitoring(section.id, {
         is_monitored: form.is_monitored,
-        DeviceIot: form.is_monitored ? form.deviceIot : null,
-        monitoring: section.monitoring,
-        setor: section.setor,
-        productionLine: section.productionLine,
-        equipament: section.equipament,
-        type_section: section.type_section,
-        secticon_parent: section.secticon_parent,
+        device_iots_ids: form.is_monitored ? form.deviceIots : [],
       });
-
       message.success("Seção atualizada com sucesso!");
       onClose();
     } catch (error) {
@@ -76,15 +75,17 @@ const MonitoringConfigureSectionModal: React.FC<Props> = ({ section, open, onClo
 
       {form.is_monitored && (
         <div>
-          <p>Dispositivo IoT</p>
+          <p>Dispositivos IoT</p>
           <Select
+            mode="multiple"
             style={{ width: "100%" }}
-            value={form.deviceIot}
-            onChange={(value) => handleChange("deviceIot", value)}
+            value={form.deviceIots}
+            onChange={(value) => handleChange("deviceIots", value)}
             options={devices.map((device) => ({
               value: device.id,
               label: device.name,
             }))}
+            placeholder="Selecione um ou mais dispositivos"
           />
         </div>
       )}

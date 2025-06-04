@@ -11,7 +11,11 @@ export interface SectionItem {
   setor: number | null;
   productionLine: number | null;
   equipament: number | null;
-  DeviceIot: number | null;
+  DeviceIot?: {
+    id: number;
+    name: string;
+    // ...outros campos
+  } | null;
 
   // Tipo da seção ("SETOR", "LINHA", "EQUIPAMENTO")
   type_section: number | null;

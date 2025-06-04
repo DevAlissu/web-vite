@@ -15,11 +15,12 @@ import type { MonitoringItem } from "@/types/monitoringTypes";
 
 export interface SectionSimple {
   id: number;
+  name: string; // <-- Adicione esta linha!
   description: string;
   is_monitored: boolean;
   monitoring: number | null;
+  // Pode incluir outros campos se quiser (secticon_parent etc)
 }
-
 interface MonitoringSensorState {
   monitorings: MonitoringItem[];
   sections: SectionSimple[];
@@ -83,13 +84,16 @@ export const useMonitoringSensorStore = create<MonitoringSensorState>(
       set({ loadingSections: true });
       try {
         const list = await fetchSectionsForSensor(monitoringId);
-        // Simplifica para a interface SectionSimple
         const simplified = list.map((sec: any) => ({
           id: sec.id,
-          description: sec.description,
+          name: sec.name ?? "-",
+          description: sec.description ?? "",
           is_monitored: sec.is_monitored,
           monitoring: sec.monitoring,
+          secticon_parent: sec.secticon_parent ?? null, // já prepara pro futuro!
+          device_iots: sec.device_iots ?? [], // prepara chips IoT
         }));
+
         set({ sections: simplified });
       } catch (err) {
         console.error("Erro ao buscar seções para Nansenson:", err);
@@ -158,13 +162,17 @@ export const useMonitoringSensorStore = create<MonitoringSensorState>(
     },
 
     // 7) Busca uma única seção por ID
+    // 7) Busca uma única seção por ID
     fetchSingleSection: async (sectionId) => {
       const sec = await getSectionByIdForSensor(sectionId);
       return {
         id: sec.id,
-        description: sec.description,
+        name: sec.name ?? sec.description ?? "-", // <-- Corrige aqui!
+        description: sec.description ?? "",
         is_monitored: sec.is_monitored,
         monitoring: sec.monitoring,
+        secticon_parent: sec.secticon_parent ?? null,
+        device_iots: sec.device_iots ?? [],
       };
     },
 

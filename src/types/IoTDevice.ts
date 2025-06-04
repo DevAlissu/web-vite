@@ -1,7 +1,9 @@
+// src/types/IoTDevice.ts
+
 export interface IoTDevice {
   id: number;
   name: string;
-  deveui?: string | null; 
-  type_device?: string | null; 
+  devEui: string | null;
+  type_device: "Nansenic" | "Nansenson" | null;
   equipement?: number | null;
 }

@@ -6,7 +6,7 @@ import ItemHeader from "../../layout/Header/ItemHeader";
 import Button from "../../components/Button/Button";
 import CustomTable from "../../components/Table/Table";
 import ItemHeaderCabecalho from "../../layout/Header/components/ItemHeaderCabecalho";
-import { useIoTDevicesTable } from "./hooks/useIoTDevicesTable"; 
+import { useIoTDevicesTable } from "./hooks/useIoTDevicesTable";
 
 const IoTDevices: React.FC = () => {
   const navigate = useNavigate();
@@ -18,9 +18,9 @@ const IoTDevices: React.FC = () => {
       <div className="content-container">
         <ItemHeader />
         <main className="content">
-          <ItemHeaderCabecalho 
-            title="Dispositivos IoT" 
-            subTitle="Lista de dispositivos IoT cadastrados" 
+          <ItemHeaderCabecalho
+            title="Dispositivos IoT"
+            subTitle="Lista de dispositivos IoT cadastrados"
           />
 
           <section className="actions-section">
@@ -32,7 +32,11 @@ const IoTDevices: React.FC = () => {
             >
               Cadastrar Dispositivo
             </Button>
-            <Button type="link" className="filter-btn" icon={<FilterOutlined />}>
+            <Button
+              type="link"
+              className="filter-btn"
+              icon={<FilterOutlined />}
+            >
               Filtros
             </Button>
           </section>

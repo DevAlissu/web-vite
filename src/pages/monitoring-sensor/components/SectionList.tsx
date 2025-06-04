@@ -1,3 +1,5 @@
+// src/pages/monitoring-sensor/components/SectionList.tsx
+import React from "react";
 import { Table, Badge, Button, Tooltip } from "antd";
 import { ThunderboltOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,10 +9,13 @@ import { useSectionActions } from "../hooks/useSectionActions";
 import { columnsWithActions } from "./columnsWithActions";
 import SectionExpandedTree from "./SectionExpandedTree";
 import MonitoringConfigureSectionModal from "./MonitoringConfigureSectionModal";
-import { SectionItem } from "@/types/sections";
+import type { SectionItem } from "@/types/sections";
 
-const SectionList = () => {
-  const { id } = useParams<{ id: string }>();
+interface SectionListProps {
+  monitoringId: number;
+}
+
+const SectionList: React.FC<SectionListProps> = ({ monitoringId }) => {
   const navigate = useNavigate();
 
   const {
@@ -26,25 +31,30 @@ const SectionList = () => {
   const { handleDelete } = useSectionActions();
   const { setoresPrincipais } = useSectionHierarchy(sections);
 
-  // Verifica se uma seção ou qualquer descendente possui IoT (LED Verde)
-  const hasIotDeviceRecursive = (section: SectionItem, allSections: SectionItem[]): boolean => {
+  // Verifica recursivamente se a seção ou quaisquer sub-seções têm DeviceIoT
+  const hasIotDeviceRecursive = (
+    section: SectionItem,
+    allSections: SectionItem[]
+  ): boolean => {
     if (section.DeviceIot) return true;
-    const children = allSections.filter((s) => s.secticon_parent === section.id);
+    const children = allSections.filter(
+      (s) => s.secticon_parent === section.id
+    );
     return children.some((child) => hasIotDeviceRecursive(child, allSections));
   };
 
-  // Verifica se a seção tem um dispositivo IoT diretamente associado (Ícone de Monitoramento)
+  // Seção tem DeviceIoT diretamente associado (para desenhar o ícone de monitoramento)
   const hasDirectIotDevice = (section: SectionItem): boolean => {
     return !!section.DeviceIot;
   };
 
-  // Função para lidar com o clique no ícone de monitoramento
+  // Ao clicar no ícone “⚡” de monitorar (pode abrir um mini-modal mais tarde)
   const handleMonitorClick = (section: SectionItem) => {
     console.log("🔍 Monitoramento da seção:", section.name);
-    // Aqui vamos abrir o mini modal futuramente
+    // Caso queira abrir um modal customizado, faça aqui
   };
 
-  // Substitui a coluna "Nome" para adicionar LED verde e ícone de monitoramento
+  // “Injeta” o LED verde + ícone ⚡ na coluna “name”
   const enhancedColumns = columns.map((col) => {
     if (col.key === "name") {
       return {
@@ -55,10 +65,8 @@ const SectionList = () => {
 
           return (
             <span style={{ display: "flex", alignItems: "center" }}>
-              {/* LED Verde para toda a árvore */}
               {hasIot && <Badge status="success" style={{ marginRight: 6 }} />}
               {record.name}
-              {/* Ícone de Monitoramento apenas para a seção diretamente associada */}
               {hasDirectIot && (
                 <Tooltip title="Monitoramento Ativo">
                   <Button
@@ -77,17 +85,22 @@ const SectionList = () => {
     return col;
   });
 
+  // Colunas de ação: Edit | Configurar | Delete
   const actionColumns = columnsWithActions(enhancedColumns, {
-    onEdit: (sectionId) => navigate(`/monitoring/edit-section/${sectionId}`),
+    onEdit: (sectionId) =>
+      navigate(`/sensor-monitoring/edit-section/${sectionId}`),
     onDelete: handleDelete,
     onConfigure: handleOpenConfigure,
   });
 
   return (
     <>
+      {/* Tabela de Seções (filtradas pelo monitoringId) */}
       <Table
         columns={actionColumns}
-        dataSource={setoresPrincipais.filter((s) => s.monitoring === Number(id))}
+        dataSource={setoresPrincipais.filter(
+          (s) => s.monitoring === monitoringId
+        )}
         loading={loading}
         rowKey="id"
         expandable={{
@@ -104,6 +117,7 @@ const SectionList = () => {
         pagination={{ pageSize: 10 }}
       />
 
+      {/* Modal de “Configurar Seção” */}
       {sectionToConfigure && (
         <MonitoringConfigureSectionModal
           section={sectionToConfigure}

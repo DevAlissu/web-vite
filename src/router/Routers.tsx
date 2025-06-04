@@ -47,7 +47,7 @@ import SectionEdit from "../pages/monitoring/components/SectionEdit";
 // Monitoramento (NansenSensor – mock)
 import MonitoringSensor from "../pages/monitoring-sensor/MonitoringSensor";
 import MonitoringSensorForm from "../pages/monitoring-sensor/components/MonitoringForm";
-import SectionListSensor from "../pages/monitoring-sensor/components/SectionList";
+import MonitoringConfigureSensor from "../pages/monitoring-sensor/components/MonitoringConfigure";
 import MonitoringAddSectionSensor from "../pages/monitoring-sensor/components/MonitoringAddSection";
 import MonitoringSensorEdit from "../pages/monitoring-sensor/components/MonitoringEdit";
 import SectionEditSensor from "../pages/monitoring-sensor/components/SectionEdit";
@@ -66,6 +66,11 @@ import EditQuiz from "../pages/quizzes/components/EditQuiz";
 import MissionsPage from "../pages/missions/Missions";
 import MissionRegister from "../pages/missions/missionregister/Register";
 import EditMission from "../pages/missions/components/EditMission";
+
+// Energia: Gestão de Faturamento
+import EnergyBillingList from "../pages/energyBilling/EnergyBillingList";
+import EnergyBillingForm from "../pages/energyBilling/EnergyBillingForm";
+
 export default function Routers() {
   return (
     <Routes>
@@ -144,7 +149,7 @@ export default function Routers() {
         />
         <Route
           path="/sensor-monitoring/configure/:id"
-          element={<SectionListSensor />}
+          element={<MonitoringConfigureSensor />}
         />
         <Route
           path="/sensor-monitoring/add-section/:id"
@@ -173,6 +178,21 @@ export default function Routers() {
         <Route path="/missions" element={<MissionsPage />} />
         <Route path="/missions/register" element={<MissionRegister />} />
         <Route path="/missions/edit/:id" element={<EditMission />} />
+
+        {/* Energia: Gestão de Faturamento */}
+        <Route path="/energy-billing" element={<EnergyBillingList />} />
+        <Route
+          path="/energy-billing/new"
+          element={<EnergyBillingForm mode="create" />}
+        />
+        <Route
+          path="/energy-billing/edit/:id"
+          element={<EnergyBillingForm mode="edit" />}
+        />
+        <Route
+          path="/energy-billing/view/:id"
+          element={<EnergyBillingForm mode="view" />}
+        />
 
         {/* Redirecionamentos */}
         <Route path="/" element={<Navigate to="/home" replace />} />

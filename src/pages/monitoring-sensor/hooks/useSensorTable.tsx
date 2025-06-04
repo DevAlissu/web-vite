@@ -1,39 +1,44 @@
-// src/pages/monitoring-sensor/hooks/useSensorTable.tsx
-import { useEffect, useState } from "react";
+// src/pages/monitoring-sensor/hooks/useSensorTable.ts
+
+import { useEffect } from "react";
+import { Button, Tooltip } from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { message } from "antd";
-import Actions from "@/components/actions/Actions";
-import { useSensorMonitoringStore } from "@/store/sensorMonitoringStore";
+import { useMonitoringSensorStore } from "@/store/monitoringSensorStore";
 import type { MonitoringItem } from "@/types/monitoringTypes";
 
-export const useSensorTable = () => {
+/**
+ * useSensorTable retorna as colunas (com “Configurar”) e a lista de monitoramentos do tipo NANSENsor.
+ */
+export function useSensorTable() {
   const navigate = useNavigate();
-  const { sensorMonitorings, fetchSensorMonitorings, deleteSensorMonitoring } =
-    useSensorMonitoringStore();
+  const {
+    monitorings,
+    fetchAllMonitorings,
+    deleteMonitoring,
+    loadingMonitorings,
+  } = useMonitoringSensorStore();
 
-  const [loading, setLoading] = useState(true);
-
+  // Ao montar, busca todos os monitoramentos tipo NANSENsor
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        await fetchSensorMonitorings();
-      } catch {
-        message.error("Erro ao carregar sensores.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [fetchSensorMonitorings]);
+    fetchAllMonitorings();
+  }, [fetchAllMonitorings]);
 
+  // Handler para “Configurar Seções” → leva à página de seções deste monitoramento
+  const handleConfigure = (monitoringId: number) => {
+    navigate(`/sensor-monitoring/configure/${monitoringId}`);
+  };
+
+  // Colunas para a tabela de NANSENsor (sem o botão de “Visualizar”)
   const columns = [
     {
       title: "Nome",
       dataIndex: "name",
       key: "name",
-      sorter: (a: MonitoringItem, b: MonitoringItem) =>
-        a.name.localeCompare(b.name),
     },
     {
       title: "Descrição",
@@ -41,21 +46,47 @@ export const useSensorTable = () => {
       key: "description",
     },
     {
+      title: "Consumo Estimado",
+      dataIndex: "estimated_consumption",
+      key: "estimated_consumption",
+      render: (value: number) => `${value} kWh`,
+    },
+    {
       title: "Ações",
       key: "actions",
-      align: "center",
       render: (_: any, record: MonitoringItem) => (
-        <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-          <Actions
-            onEdit={() => navigate(`/sensor-monitoring/edit/${record.id}`)}
-            onConfigure={() =>
-              navigate(`/sensor-monitoring/configure/${record.id}`)
-            }
-            onDelete={async () => {
-              await deleteSensorMonitoring(record.id);
-              message.success("Sensor excluído.");
-            }}
-          />
+        <div className="actions">
+          {/* Editar */}
+          <Tooltip title="Editar">
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={() => navigate(`/sensor-monitoring/edit/${record.id}`)}
+            >
+              Editar
+            </Button>
+          </Tooltip>
+
+          {/* Excluir */}
+          <Tooltip title="Excluir">
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => deleteMonitoring(record.id)}
+            >
+              Excluir
+            </Button>
+          </Tooltip>
+
+          {/* Configurar Seções */}
+          <Tooltip title="Configurar Seções">
+            <Button
+              type="text"
+              icon={<SettingOutlined />}
+              onClick={() => handleConfigure(record.id)}
+              style={{ marginLeft: 8 }}
+            />
+          </Tooltip>
         </div>
       ),
     },
@@ -63,7 +94,7 @@ export const useSensorTable = () => {
 
   return {
     columns,
-    monitorings: sensorMonitorings,
-    loading,
+    monitorings,
+    loading: loadingMonitorings,
   };
-};
+}

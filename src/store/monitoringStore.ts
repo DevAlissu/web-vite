@@ -1,8 +1,12 @@
 // src/store/monitoringStore.ts
+
 import { create } from "zustand";
-import { MonitoringItem } from "@/types/monitoringTypes";
 import api from "@/services/api";
-import { fetchActiveMonitoringCount } from "@/services/monitoringService";
+import {
+  fetchActiveMonitoringCount,
+  fetchMonitorings as fetchMonitoringList,
+} from "@/services/monitoringService";
+import { MonitoringItem } from "@/types/monitoringTypes";
 
 interface MonitoringState {
   monitorings: MonitoringItem[];
@@ -10,10 +14,14 @@ interface MonitoringState {
   activeCount: number;
   fetchMonitorings: () => Promise<void>;
   fetchActiveCount: () => Promise<void>;
-  createMonitoring: (data: Partial<MonitoringItem>) => Promise<void>;
+  createMonitoring: (
+    data: Omit<MonitoringItem, "id" | "created_at" | "type_mmonitoring">
+  ) => Promise<void>;
   updateMonitoring: (
     id: number,
-    data: Partial<MonitoringItem>
+    data: Partial<
+      Omit<MonitoringItem, "id" | "created_at" | "type_mmonitoring">
+    >
   ) => Promise<void>;
   deleteMonitoring: (id: number) => Promise<void>;
 }
@@ -46,9 +54,14 @@ export const useMonitoringStore = create<MonitoringState>((set) => ({
     }
   },
 
+  // Criar monitoramento (adiciona type_mmonitoring = "Nansenic")
   createMonitoring: async (data) => {
     try {
-      const response = await api.post<MonitoringItem>("/monitorings/", data);
+      const payload = {
+        ...data,
+        type_mmonitoring: "Nansenic" as const,
+      };
+      const response = await api.post<MonitoringItem>("/monitorings/", payload);
       set((state) => ({
         monitorings: [...state.monitorings, response.data],
       }));
@@ -57,6 +70,7 @@ export const useMonitoringStore = create<MonitoringState>((set) => ({
     }
   },
 
+  // Atualizar monitoramento (mantém o type já salvo)
   updateMonitoring: async (id, data) => {
     try {
       const response = await api.put<MonitoringItem>(
@@ -73,6 +87,7 @@ export const useMonitoringStore = create<MonitoringState>((set) => ({
     }
   },
 
+  // Excluir monitoramento
   deleteMonitoring: async (id) => {
     try {
       await api.delete(`/monitorings/${id}/`);

@@ -1,4 +1,5 @@
 // src/pages/monitoring-sensor/MonitoringSensor.tsx
+
 import React from "react";
 import { PlusOutlined, FilterOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -9,19 +10,21 @@ import CustomTable from "../../components/Table/Table";
 import ItemHeaderCabecalho from "../../layout/Header/components/ItemHeaderCabecalho";
 import { useSensorTable } from "./hooks/useSensorTable";
 
-const MonitoringSensor: React.FC = () => {
+const MonitoringSensorPage: React.FC = () => {
   const navigate = useNavigate();
   const { columns, monitorings, loading } = useSensorTable();
 
   return (
     <div className="layout-container">
       <ItemSideBar />
+
       <div className="content-container">
         <ItemHeader />
+
         <main className="content">
           <ItemHeaderCabecalho
-            title="Nansensor"
-            subTitle="Lista de NansenSensor"
+            title="NANSENsor"
+            subTitle="Lista de monitoramentos do tipo NANSENsor"
           />
 
           <section className="actions-section">
@@ -30,7 +33,7 @@ const MonitoringSensor: React.FC = () => {
               icon={<PlusOutlined />}
               onClick={() => navigate("/sensor-monitoring/register")}
             >
-              Cadastrar Sensor
+              Novo Monitoramento Sensor
             </Button>
             <Button type="link" icon={<FilterOutlined />}>
               Filtros
@@ -50,4 +53,4 @@ const MonitoringSensor: React.FC = () => {
   );
 };
 
-export default MonitoringSensor;
+export default MonitoringSensorPage;

@@ -4,7 +4,6 @@ import { useProductionLinesStore } from "@/store/ProductionLinesStore";
 import { useEquipamentsStore } from "@/store/equipaments";
 import { useIoTDevices } from "@/hooks/useIoTDevices";
 import { useTypeSectionStore } from "@/store/typeSectionStore";
-import { useSectionStore } from "@/store/sectionStore";
 
 export type SectionFormValues = {
   name: string;
@@ -28,18 +27,26 @@ export const useSectionForm = (isEdit = false) => {
   const { productionLines, fetchProductionLines } = useProductionLinesStore();
   const { equipaments, fetchEquipaments } = useEquipamentsStore();
   const { types, fetchTypes } = useTypeSectionStore();
-  const { fetchSections } = useSectionStore();
 
+  // Carrega dados para os selects (dispositivos, setores, linhas, equipamentos, tipos)
   useEffect(() => {
     fetchDevices();
     fetchSectors();
     fetchProductionLines();
     fetchEquipaments();
     fetchTypes();
-  }, []);
+  }, [
+    fetchDevices,
+    fetchSectors,
+    fetchProductionLines,
+    fetchEquipaments,
+    fetchTypes,
+  ]);
 
-  const filteredTypeSections = types.filter((t) => [1, 2, 3].includes(t.id)); // Apenas os fixos
+  // Mantém somente os tipos fixos (ID 1=SETOR, 2=LINHA, 3=EQUIPAMENTO)
+  const filteredTypeSections = types.filter((t) => [1, 2, 3].includes(t.id));
 
+  // Dado um ID (ex: 7) e um tipo (“SETOR” ou “LINHA” ou “EQUIPAMENTO”), retorna o nome daquela entidade no select
   const getSelectedLabelFromId = (
     type: SectionFormValues["type_section"],
     id: number | null
@@ -57,6 +64,7 @@ export const useSectionForm = (isEdit = false) => {
     }
   };
 
+  // Ao alterar qualquer campo do form, atualiza formValues
   const handleChange = <K extends keyof SectionFormValues>(
     name: K,
     value: SectionFormValues[K]
@@ -66,41 +74,38 @@ export const useSectionForm = (isEdit = false) => {
         return {
           ...prev,
           is_monitored: Boolean(value),
-          deviceIot: value ? prev.deviceIot : null,
+          deviceIot: Boolean(value) ? prev.deviceIot : null,
         };
       }
-  
       if (name === "type_section") {
         return {
           ...prev,
           type_section: value as SectionFormValues["type_section"],
           section_consume: null,
-          name: "", // Limpa o nome para ser atualizado com a seção de consumo
+          name: "", // vamos sobrescrever “name” ao selecionar section_consume
           deviceIot: null,
         };
       }
-  
       if (name === "section_consume") {
-        const label = getSelectedLabelFromId(formValues.type_section, value as number);
-  
-        if (isEdit) fetchSections();
-  
+        const label = getSelectedLabelFromId(
+          formValues.type_section,
+          value as number
+        );
         return {
           ...prev,
           section_consume: value as number,
-          name: label ? label : prev.name, // Atualiza o nome automaticamente
+          name: label ? label : prev.name,
           deviceIot: null,
         };
       }
-  
       return {
         ...prev,
         [name]: value,
       };
     });
   };
-  
 
+  // Retorna as opções corretas para o select “Seção de Consumo” de acordo com o tipo selecionado
   const getAvailableSections = () => {
     switch (formValues.type_section) {
       case "SETOR":

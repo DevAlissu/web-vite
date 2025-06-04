@@ -1,32 +1,53 @@
 // src/pages/monitoring-sensor/hooks/useSensor.ts
 import { useEffect } from "react";
-import { useSensorMonitoringStore } from "@/store/sensorMonitoringStore";
-import { MonitoringItem } from "@/types/monitoringTypes";
+import { useMonitoringSensorStore } from "@/store/monitoringSensorStore";
+import type { MonitoringItem } from "@/types/monitoringTypes";
 
 export const useSensor = () => {
-  const { sensorMonitorings, fetchSensorMonitorings, deleteSensorMonitoring } =
-    useSensorMonitoringStore();
+  const {
+    monitorings,
+    fetchAllMonitorings,
+    createMonitoring,
+    updateMonitoring,
+    deleteMonitoring,
+    loadingMonitorings,
+  } = useMonitoringSensorStore();
 
   useEffect(() => {
-    fetchSensorMonitorings();
-  }, [fetchSensorMonitorings]);
+    fetchAllMonitorings();
+  }, [fetchAllMonitorings]);
 
-  const addMonitoring = async (data: Partial<MonitoringItem>) => {
-    await fetchSensorMonitorings();
+  const addMonitoring = async (data: {
+    name: string;
+    description: string;
+    estimated_consumption: number;
+  }) => {
+    await createMonitoring(data);
+    await fetchAllMonitorings();
   };
 
-  const editMonitoring = async (id: number, data: Partial<MonitoringItem>) => {
-    await fetchSensorMonitorings();
+  const editMonitoring = async (
+    id: number,
+    data: {
+      name: string;
+      description: string;
+      estimated_consumption: number;
+    }
+  ) => {
+    await updateMonitoring(id, data);
+    await fetchAllMonitorings();
   };
 
   const removeMonitoring = async (id: number) => {
-    await deleteSensorMonitoring(id);
+    await deleteMonitoring(id);
+    await fetchAllMonitorings();
   };
 
   return {
-    sensorMonitorings,
+    sensorMonitorings: monitorings,
     addMonitoring,
     editMonitoring,
     removeMonitoring,
+    loading: loadingMonitorings,
   };
 };

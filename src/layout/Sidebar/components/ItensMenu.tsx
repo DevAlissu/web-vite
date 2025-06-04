@@ -16,6 +16,7 @@ import QuizIcon from "@mui/icons-material/Quiz";
 import ExploreIcon from "@mui/icons-material/Explore";
 import FactoryIcon from "@mui/icons-material/Factory";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 const ItensMenu: React.FC = () => {
@@ -111,6 +112,12 @@ const ItensMenu: React.FC = () => {
       icon: <ExploreIcon fontSize="small" />,
       label: "Missões",
       onClick: () => navigate("/missions"),
+    },
+    {
+      key: "/energy-billing",
+      icon: <ReceiptIcon fontSize="small" />,
+      label: "Faturamento",
+      onClick: () => navigate("/energy-billing"),
     },
     { key: "divider", type: "divider" },
     {

@@ -1,3 +1,5 @@
+// src/pages/iotDevices/hooks/useIoTDevicesTable.tsx
+
 import { useEffect, useState } from "react";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +13,9 @@ export const useIoTDevicesTable = () => {
   const navigate = useNavigate();
   const { devices, fetchDevices, removeDevice } = useIoTDevicesStore();
   const [loading, setLoading] = useState(true);
-  const [equipments, setEquipments] = useState<{ id: number; name: string }[]>([]);
+  const [equipments, setEquipments] = useState<{ id: number; name: string }[]>(
+    []
+  );
 
   // 🔹 Buscar dispositivos IoT e equipamentos
   useEffect(() => {
@@ -46,15 +50,32 @@ export const useIoTDevicesTable = () => {
       title: "Nome",
       dataIndex: "name",
       key: "name",
-      sorter: (a: IoTDevice, b: IoTDevice) => a.name?.localeCompare(b.name || "") || 0,
+      sorter: (a: IoTDevice, b: IoTDevice) =>
+        a.name.localeCompare(b.name || "") || 0,
       sortDirections: ["ascend", "descend"] as SortOrder[],
-      render: (text: string | undefined) => <strong>{text ?? "Sem nome"}</strong>,
+      render: (text: string) => <strong>{text || "Sem nome"}</strong>,
     },
     {
       title: "DevEUI",
-      dataIndex: "type_device", // ✅ Pegamos da API, mas mostramos como DevEUI no front
+      dataIndex: "devEui",
+      key: "devEui",
+      render: (text: string | null) => text ?? "Não informado",
+    },
+    {
+      title: "Tipo de Dispositivo",
+      dataIndex: "type_device",
       key: "type_device",
-      render: (text: string | undefined) => text ?? "Não informado",
+      render: (text: "Nansenic" | "Nansenson" | null) =>
+        text === "Nansenic"
+          ? "NANSENic"
+          : text === "Nansenson"
+          ? "NANSENsensor"
+          : "Não informado",
+      filters: [
+        { text: "NANSENic", value: "Nansenic" },
+        { text: "NANSENsensor", value: "Nansenson" },
+      ],
+      onFilter: (value: any, record: IoTDevice) => record.type_device === value,
     },
     {
       title: "Equipamento Associado",
@@ -78,7 +99,6 @@ export const useIoTDevicesTable = () => {
       ),
     },
   ];
-  
 
   return { columns, devices, loading };
 };

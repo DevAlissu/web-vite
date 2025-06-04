@@ -1,3 +1,4 @@
+// src/pages/monitoring-sensor/components/MonitoringForm.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { message } from "antd";
@@ -59,7 +60,7 @@ const MonitoringForm: React.FC = () => {
         <main className="content">
           <ItemHeaderCabecalho
             title="Cadastro de Sensor"
-            subTitle="Formulário para cadastro de sensor no NansenSensor"
+            subTitle="Formulário para cadastro de sensor no NANSENsor"
           />
 
           <DynamicForm

@@ -1,21 +1,25 @@
-import React, { useEffect, useState } from "react";
+// src/pages/monitoring-sensor/components/MonitoringAddSection.tsx
+import React, { useState } from "react";
 import { Modal, message } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
-import { useSectionStore } from "@/store/sectionStore";
-import { useSectionForm } from "@/pages/monitoring/hooks/useSectionForm";
+import { useMonitoringSensorStore } from "@/store/monitoringSensorStore";
+import { useSectionForm } from "../hooks/useSectionForm";
 import SectionForm from "./SectionForm";
 
 const MonitoringAddSection: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const monitoringId = Number(id);
   const navigate = useNavigate();
-  const { addSection } = useSectionStore();
+
+  // Pegamos createSectionForMonitoring do store “sensor-monitoring”
+  const { createSectionForMonitoring } = useMonitoringSensorStore();
 
   const {
     formValues,
     handleChange,
     getAvailableSections,
     devices,
-    typeSections, // ✅ Tipos de seção da API
+    typeSections,
   } = useSectionForm();
 
   const [loading, setLoading] = useState(false);
@@ -26,32 +30,45 @@ const MonitoringAddSection: React.FC = () => {
       return;
     }
 
-    const typeId = typeSections.find((t) => t.name === formValues.type_section)?.id;
-
+    // Traduzimos o “type_section” string ("SETOR", "LINHA" ou "EQUIPAMENTO") para o ID numérico
+    const typeId = typeSections.find(
+      (t) => t.name === formValues.type_section
+    )?.id;
     if (!typeId) {
       message.error("ID do tipo de seção não encontrado!");
       return;
     }
 
-    console.log("👉 Enviando tipo_section ID:", typeId);
-
     setLoading(true);
     try {
-      await addSection({
-        name: formValues.name,
+      // ⬇️ Observação: aqui fazemos cast para “any” pois createSectionForMonitoring espera Partial<SectionSimple>,
+      // mas enviamos campos extras (type_section, setor, productionLine, equipament, DeviceIot).
+      // Dessa forma o TS não reclama, e o backend recebe tudo corretamente.
+      await createSectionForMonitoring(monitoringId, {
+        description: formValues.name,
         is_monitored: formValues.is_monitored,
-        monitoring: Number(id),
+        monitoring: monitoringId,
         type_section: typeId,
-        DeviceIot: formValues.is_monitored ? formValues.deviceIot : null,
-        setor: formValues.type_section === "SETOR" ? formValues.section_consume : null,
-        productionLine: formValues.type_section === "LINHA" ? formValues.section_consume : null,
-        equipament: formValues.type_section === "EQUIPAMENTO" ? formValues.section_consume : null,
-      });
+        setor:
+          formValues.type_section === "SETOR"
+            ? formValues.section_consume
+            : undefined,
+        productionLine:
+          formValues.type_section === "LINHA"
+            ? formValues.section_consume
+            : undefined,
+        equipament:
+          formValues.type_section === "EQUIPAMENTO"
+            ? formValues.section_consume
+            : undefined,
+        DeviceIot: formValues.is_monitored ? formValues.deviceIot : undefined,
+      } as any);
 
       message.success("Seção adicionada com sucesso!");
-      navigate(`/monitoring/configure/${id}`);
+      // Volta para a tela de “configure” assim que adiciona
+      navigate(`/sensor-monitoring/configure/${monitoringId}`);
     } catch (error) {
-      console.error("❌ Erro real ao adicionar:", error);
+      console.error("Erro ao adicionar seção:", error);
       message.error("Erro ao adicionar seção!");
     } finally {
       setLoading(false);
@@ -63,17 +80,19 @@ const MonitoringAddSection: React.FC = () => {
       title="Adicionar Nova Seção"
       open={true}
       footer={null}
-      onCancel={() => navigate(`/monitoring/configure/${id}`)}
+      onCancel={() => navigate(`/sensor-monitoring/configure/${monitoringId}`)}
     >
       <SectionForm
         values={formValues}
         onChange={handleChange}
-        onCancel={() => navigate(`/monitoring/configure/${id}`)}
+        onCancel={() =>
+          navigate(`/sensor-monitoring/configure/${monitoringId}`)
+        }
         onSubmit={handleSubmit}
         loading={loading}
         availableSections={getAvailableSections()}
         devices={devices}
-        typeSections={typeSections} // ✅ Passa os tipos pro form
+        typeSections={typeSections}
       />
     </Modal>
   );

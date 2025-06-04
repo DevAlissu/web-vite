@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 interface AuthContextProps {
   token: string | null;
-  login: (token: string) => void;
+  login: (access: string, refresh: string) => void;
   logout: () => void;
 }
 
@@ -23,15 +23,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
 
-  const login = (newToken: string) => {
-    localStorage.setItem("userToken", newToken);
-    setToken(newToken);
-    navigate("/home");  
+  const login = (access: string, refresh: string) => {
+    localStorage.setItem("userToken", access);
+    localStorage.setItem("refreshToken", refresh);
+    setToken(access);
+    navigate("/home");
   };
 
  
   const logout = () => {
     localStorage.removeItem("userToken");
+    localStorage.removeItem("refreshToken");
     setToken(null);
     navigate("/login");
   };

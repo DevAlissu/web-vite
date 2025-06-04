@@ -57,7 +57,7 @@ export default function Login() {
 
       // 3) back pode retornar 200 ou 201
       if (response.status === 200 || response.status === 201) {
-        login(response.data.access);
+        login(response.data.access, response.data.refresh);
         // login() já faz navigate("/home")
       } else {
         openNotificationWithIcon(
